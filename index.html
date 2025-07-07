@@ -86,10 +86,6 @@
       margin-top: 16px;
     }
   </style>
-  </head>
-<body>
-    <div id="root"></div>
-  <div id="root"></div>
   <script>
     // State variables
     let input = '';
@@ -120,42 +116,35 @@
       }
     }
 
-    // Handle question submission
+    // Handle input submission (question or code)
     async function handleSubmit() {
       if (!input) return;
       try {
-        const res = await fetch(`${GAS_URL}?action=checkQuestion&userId=${userId}&question=${encodeURIComponent(input)}`);
-        const result = await res.json();
-        response = result.response;
-        showPayment = result.showPayment;
+        // Check if input looks like a code (16 alphanumeric characters)
+        const isCode = /^[a-zA-Z0-9]{16}$/.test(input);
+        if (isCode) {
+          const res = await fetch(`${GAS_URL}?action=verifyCode&code=${input}`);
+          const result = await res.json();
+          if (result.status === 'valid') {
+            isChatroom = true;
+            fetchMessages();
+            codeMessage = result.message;
+          } else {
+            codeMessage = result.message;
+          }
+        } else {
+          const res = await fetch(`${GAS_URL}?action=checkQuestion&userId=${userId}&question=${encodeURIComponent(input)}`);
+          const result = await res.json();
+          response = result.response || 'Error: No response from server.';
+          showPayment = result.showPayment || false;
+          codeMessage = '';
+        }
         input = '';
-        codeMessage = '';
         render();
       } catch (error) {
         response = 'Error processing request.';
-        console.error('Question error:', error);
-        render();
-      }
-    }
-
-    // Handle code submission
-    async function handleCodeSubmit() {
-      if (!codeInput) return;
-      try {
-        const res = await fetch(`${GAS_URL}?action=verifyCode&code=${codeInput}`);
-        const result = await res.json();
-        if (result.status === 'valid') {
-          isChatroom = true;
-          fetchMessages();
-          codeMessage = result.message;
-        } else {
-          codeMessage = result.message;
-        }
-        codeInput = '';
-        render();
-      } catch (error) {
-        codeMessage = 'Error verifying code.';
-        console.error('Code verification error:', error);
+        codeMessage = '';
+        console.error('Submission error:', error);
         render();
       }
     }
@@ -189,8 +178,6 @@
             <button onclick="handleSubmit()">Submit</button>
             ${response ? `<div class="response">${response}</div>` : ''}
             ${showPayment ? `<a href="https://nowpayments.io/payment/?iid=5027752605" class="payment-link">Acquire Code ($2.10)</a>` : ''}
-            <input id="codeInput" type="text" value="${codeInput}" placeholder="Enter your code...">
-            <button onclick="handleCodeSubmit()">Verify Code</button>
             ${codeMessage ? `<pre class="code-message">${codeMessage}</pre>` : ''}
             ${showPayment ? `
               <footer>
@@ -203,7 +190,6 @@
       // Attach event listeners
       if (!isChatroom) {
         document.getElementById('input').addEventListener('input', (e) => { input = e.target.value; });
-        document.getElementById('codeInput').addEventListener('input', (e) => { codeInput = e.target.value; });
       } else {
         document.getElementById('chatInput').addEventListener('input', (e) => { chatInput = e.target.value; });
       }
@@ -212,5 +198,8 @@
     // Initial render
     render();
   </script>
+</head>
+<body>
+  <div id="root"></div>
 </body>
 </html>
