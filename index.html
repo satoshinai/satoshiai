@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nakamoto</title>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 100vh;
+      margin: 0;
+      padding: 16px;
+    }
+    .container {
+      max-width: 384px;
+      width: 100%;
+      text-align: center;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 16px;
+    }
+    input {
+      width: 100%;
+      padding: 8px;
+      background: #1a1a1a;
+      border: 1px solid #4a4a4a;
+      color: #fff;
+      border-radius: 4px;
+      margin-bottom: 8px;
+    }
+    button {
+      width: 100%;
+      padding: 8px;
+      background: #333;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #4a4a4a;
+    }
+    .response, .code-message {
+      margin-top: 16px;
+      white-space: pre-wrap;
+    }
+    .chatroom {
+      height: 256px;
+      overflow-y: auto;
+      background: #1a1a1a;
+      padding: 16px;
+      border-radius: 4px;
+      margin-bottom: 16px;
+    }
+    .chat-message {
+      margin-bottom: 8px;
+    }
+    .payment-link {
+      display: block;
+      margin-top: 16px;
+      padding: 8px;
+      background: #16a34a;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 4px;
+    }
+    .payment-link:hover {
+      background: #22c55e;
+    }
+    footer {
+      color: #6b7280;
+      font-size: 12px;
+      text-align: center;
+      max-width: 384px;
+      margin-top: 32px;
+    }
+    .error {
+      color: #ef4444;
+      margin-top: 16px;
+    }
+  </style>
+  <script>
+    // State variables
+    let input = '';
+    let response = '';
+    let showPayment = false;
+    let codeInput = '';
+    let chatMessages = [];
+    let chatInput = '';
+    let isChatroom = false;
+    let codeMessage = '';
+    const userId = Math.random().toString(36).substring(2); // Random user ID
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbw8gr7IeLjNEcVUgUVJgQQBsT0_4_rIbYjLiQOJ3hW35fidxL691krcuordr4uRdlRQ/exec';
+
+    // DOM elements
+    const root = document.getElementById('root');
+
+    // Fetch chat messages every 5 seconds
+    function fetchMessages() {
+      if (isChatroom) {
+        fetch(`${GAS_URL}?action=getMessages`)
+          .then(res => res.json())
+          .then(data => {
+            chatMessages = data.messages || [];
+            render();
+          })
+          .catch(error => console.error('Error fetching messages:', error));
+        setTimeout(fetchMessages, 5000);
+      }
+    }
+
+    // Handle question submission
+    async function handleSubmit() {
+      if (!input) return;
+      try {
+        const res = await fetch(`${GAS_URL}?action=checkQuestion&userId=${userId}&question=${encodeURIComponent(input)}`);
+        const result = await res.json();
+        response = result.response;
+        showPayment = result.showPayment;
+        input = '';
+        codeMessage = '';
+        render();
+      } catch (error) {
+        response = 'Error processing request.';
+        console.error('Question error:', error);
+        render();
+      }
+    }
+
+    // Handle code submission
+    async function handleCodeSubmit() {
+      if (!codeInput) return;
+      try {
+        const res = await fetch(`${GAS_URL}?action=verifyCode&code=${codeInput}`);
+        const result = await res.json();
+        if (result.status === 'valid') {
+          isChatroom = true;
+          fetchMessages();
+          codeMessage = result.message;
+        } else {
+          codeMessage = result.message;
+        }
+        codeInput = '';
+        render();
+      } catch (error) {
+        codeMessage = 'Error verifying code.';
+        console.error('Code verification error:', error);
+        render();
+      }
+    }
+
+    // Handle chat message submission
+    async function handleChatSubmit() {
+      if (!chatInput.match(/^[A-Z]{2}\d{2}$/)) return;
+      try {
+        await fetch(`${GAS_URL}?action=addMessage&text=${chatInput}`);
+        chatInput = '';
+        fetchMessages();
+      } catch (error) {
+        console.error('Chat error:', error);
+      }
+    }
+
+    // Render UI
+    function render() {
+      root.innerHTML = `
+        <div class="container">
+          ${isChatroom ? `
+            <h1>Chatroom</h1>
+            <div class="chatroom">
+              ${chatMessages.map(msg => `<div class="chat-message">${msg}</div>`).join('')}
+            </div>
+            <input id="chatInput" type="text" value="${chatInput}" placeholder="Enter AB12 format...">
+            <button onclick="handleChatSubmit()">Send</button>
+          ` : `
+            <h1>Ask Nakamoto</h1>
+            <input id="input" type="text" value="${input}" placeholder="Ask a question...">
+            <button onclick="handleSubmit()">Submit</button>
+            ${response ? `<div class="response">${response}</div>` : ''}
+            ${showPayment ? `<a href="https://nowpayments.io/payment/?iid=5027752605" class="payment-link">Acquire Code ($2.10)</a>` : ''}
+            <input id="codeInput" type="text" value="${codeInput}" placeholder="Enter your code...">
+            <button onclick="handleCodeSubmit()">Verify Code</button>
+            ${codeMessage ? `<pre class="code-message">${codeMessage}</pre>` : ''}
+            ${showPayment ? `
+              <footer>
+                <p>Disclaimer: The Nakamoto Project is an experimental game, not a financial product or investment. Purchased codes are unique digital fragments for participating in this project, with no guaranteed monetary value and a total supply limited to 350,000. Any future use of codes, if applicable, is speculative and not guaranteed. Participation requires a non-refunded $2.10 payment. By participating, you acknowledge the risks and use the platform at your own discretion. The Nakamoto Project is not responsible for any losses or expectations.</p>
+              </footer>
+            ` : ''}
+          `}
+        </div>
+      `;
+      // Attach event listeners
+      if (!isChatroom) {
+        document.getElementById('input').addEventListener('input', (e) => { input = e.target.value; });
+        document.getElementById('codeInput').addEventListener('input', (e) => { codeInput = e.target.value; });
+      } else {
+        document.getElementById('chatInput').addEventListener('input', (e) => { chatInput = e.target.value; });
+      }
+    }
+
+    // Initial render
+    render();
+  </script>
+</head>
+<body>
+  <div id="root"></div>
+</body>
+</html>
