@@ -4,7 +4,7 @@
   <meta http-equiv="Cache-Control" content="public, max-age=3600">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nakamoto</title>
+  <title>Satoshi's Enigma</title>
   <style>
     body {
       background: #000;
@@ -26,6 +26,7 @@
     h1 {
       font-size: 24px;
       margin-bottom: 16px;
+      color: #f0c040; /* Satoshi金色 */
     }
     input {
       width: 100%;
@@ -82,16 +83,24 @@
       max-width: 384px;
       margin-top: 32px;
     }
+    .hint {
+      font-size: 12px;
+      color: #aaa;
+      margin-top: 8px;
+    }
     .error {
       color: #ef4444;
       margin-top: 16px;
     }
+    .privacy {
+      font-size: 12px;
+      margin-top: 16px;
+    }
   </style>
-  </head>
+</head>
 <body>
   <div id="root"></div>
   <script>
-    // State variables
     let input = '';
     let response = '';
     let showPayment = false;
@@ -100,13 +109,9 @@
     let chatInput = '';
     let isChatroom = false;
     let codeMessage = '';
-    const userId = Math.random().toString(36).substring(2); // Random user ID
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec';;
+    const userId = Math.random().toString(36).substring(2);
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec';
 
-    // DOM elements
-    const root = document.getElementById('root');
-
-    // Fetch chat messages every 5 seconds
     function fetchMessages() {
       if (isChatroom) {
         fetch(`${GAS_URL}?action=getMessages`)
@@ -120,11 +125,9 @@
       }
     }
 
-    // Handle input submission (question or code)
     async function handleSubmit() {
       if (!input) return;
       try {
-        // Check if input looks like a code (16 alphanumeric characters)
         const isCode = /^[a-zA-Z0-9]{16}$/.test(input);
         if (isCode) {
           const res = await fetch(`${GAS_URL}?action=verifyCode&code=${input}`);
@@ -153,7 +156,6 @@
       }
     }
 
-    // Handle chat message submission
     async function handleChatSubmit() {
       if (!chatInput.match(/^[A-Z]{2}\d{2}$/)) return;
       try {
@@ -165,7 +167,6 @@
       }
     }
 
-    // Render UI
     function render() {
       root.innerHTML = `
         <div class="container">
@@ -177,21 +178,22 @@
             <input id="chatInput" type="text" value="${chatInput}" placeholder="Enter AB12 format...">
             <button onclick="handleChatSubmit()">Send</button>
           ` : `
-            <h1>Ask Nakamoto</h1>
+            <h1>Satoshi's Enigma</h1>
             <input id="input" type="text" value="${input}" placeholder="Ask a question...">
             <button onclick="handleSubmit()">Submit</button>
             ${response ? `<div class="response">${response}</div>` : ''}
-            ${showPayment ? `<a href="https://nowpayments.io/payment/?iid=5027752605" class="payment-link">Acquire Code ($2.10)</a>` : ''}
+            ${showPayment ? `<a href="https://nowpayments.io/payment/?iid=6068590454" class="payment-link">Support the Legacy ($29.00)</a>` : ''}
             ${codeMessage ? `<pre class="code-message">${codeMessage}</pre>` : ''}
+            <div class="hint">Uncover hidden truths—ask about my legacy! Future revelations await...</div>
+            <div class="privacy"><a href="/privacy-policy">Privacy Policy</a> | Consent required.</div>
             ${showPayment ? `
               <footer>
-                <p>Disclaimer: The Nakamoto Project is an experimental game, not a financial product or investment. Purchased codes are unique digital fragments for participating in this project, with no guaranteed monetary value and a total supply limited to 350,000. Any future use of codes, if applicable, is speculative and not guaranteed. Participation requires a non-refunded $2.10 payment. By participating, you acknowledge the risks and use the platform at your own discretion. The Nakamoto Project is not responsible for any losses or expectations.</p>
+                <p>Disclaimer: Satoshi's Enigma is an experimental game, not a financial product. Codes are unique digital fragments (max 350,000), with no guaranteed value. Participation costs $29.00 (non-refunded). Future use, including potential digital heritage, is speculative. Use at your own risk.</p>
               </footer>
             ` : ''}
           `}
         </div>
       `;
-      // Attach event listeners
       if (!isChatroom) {
         document.getElementById('input').addEventListener('input', (e) => { input = e.target.value; });
       } else {
@@ -199,11 +201,7 @@
       }
     }
 
-    // Initial render
     render();
   </script>
-</head>
-<body>
-  <div id="root"></div>
 </body>
 </html>
