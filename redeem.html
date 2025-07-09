@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <style>
+      body { font-family: Arial, sans-serif; margin: 20px; }
+      .input-group { margin: 10px 0; }
+      label { display: inline-block; width: 100px; }
+      input { padding: 5px; }
+      button { padding: 5px 10px; }
+      #result { margin-top: 10px; color: #333; }
+      #address { display: none; }
+    </style>
+  </head>
+  <body>
+    <h2>Redeem Your Code</h2>
+    <div id="redeem">
+      <div class="input-group">
+        <label>Enter Code:</label><input type="text" id="codeInput">
+      </div>
+      <button onclick="submitCode()">Submit</button>
+      <div id="address" class="input-group">
+        <label>Postal Address:</label><input type="text" id="postalInput">
+        <button onclick="submitAddress()">Confirm</button>
+      </div>
+      <div id="result"></div>
+    </div>
+
+    <script>
+      function submitCode() {
+        const code = document.getElementById('codeInput').value;
+        google.script.run.withSuccessHandler(updateResult).handleRedeem({ code: code });
+      }
+
+      function submitAddress() {
+        const code = document.getElementById('codeInput').value;
+        const address = document.getElementById('postalInput').value;
+        google.script.run.withSuccessHandler(updateResult).handleRedeemAddress({ code: code, address: address });
+      }
+
+      function updateResult(data) {
+        const resultDiv = document.getElementById('result');
+        resultDiv.innerHTML = data.message;
+        if (data.showAddress) {
+          document.getElementById('address').style.display = 'block';
+        } else if (data.chatroom) {
+          resultDiv.innerHTML += '<br>Entering xAI Chatroom... <a href="https://x.ai/chat" target="_blank">Go to Chat</a>';
+        }
+      }
+    </script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>
+      google.script.url = function() { return 'https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec'; };
+    </script>
+  </body>
+</html>
