@@ -5,96 +5,213 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Satoshi's Enigma</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
   <style>
     body {
-      background: #000;
-      color: #fff;
-      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0a0a1a, #1a2a3a);
+      background-size: cover;
+      background-attachment: fixed;
+      color: #e0e0f0;
+      font-family: 'Roboto', sans-serif;
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: space-between;
+      justify-content: center;
       min-height: 100vh;
       margin: 0;
-      padding: 16px;
+      padding: 0;
+      overflow-x: hidden;
     }
     .container {
-      max-width: 384px;
+      max-width: 400px;
       width: 100%;
       text-align: center;
+      background: rgba(10, 10, 26, 0.85);
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
+      border: 1px solid rgba(240, 192, 64, 0.1);
+      position: relative;
+      overflow: hidden;
+    }
+    .container::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle, rgba(240, 192, 64, 0.05) 0%, transparent 70%);
+      animation: rotate 20s linear infinite;
+      z-index: 0;
+    }
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
     h1 {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 32px;
+      margin-bottom: 25px;
+      color: #f0c040;
+      text-shadow: 0 2px 6px rgba(240, 192, 64, 0.3);
+      position: relative;
+      z-index: 1;
+    }
+    .challenge {
+      margin: 25px 0;
+      padding: 20px;
+      background: rgba(26, 26, 46, 0.9);
+      border-radius: 10px;
+      position: relative;
+      z-index: 1;
+      border-left: 4px solid #f0c040;
+    }
+    .challenge-content {
+      position: relative;
+      z-index: 1;
+    }
+    .encrypted-message {
       font-size: 24px;
-      margin-bottom: 16px;
-      color: #f0c040; /* Satoshi金色 */
+      margin: 15px 0;
+      color: #f0c040;
+      font-family: 'Orbitron', sans-serif;
+    }
+    .key-hint {
+      font-size: 18px;
+      margin: 10px 0;
+      color: #a0a0b0;
+      font-style: italic;
+    }
+    .progress {
+      width: 100%;
+      height: 12px;
+      background: #2a2a4a;
+      margin: 15px 0;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #f0c040, #d4a017);
+      width: 0;
+      border-radius: 6px;
+      transition: width 1.2s ease-in-out;
     }
     input {
       width: 100%;
-      padding: 8px;
-      background: #1a1a1a;
-      border: 1px solid #4a4a4a;
-      color: #fff;
-      border-radius: 4px;
-      margin-bottom: 8px;
+      padding: 12px;
+      background: #1a1a2e;
+      border: 2px solid #3a3a5a;
+      color: #e0e0f0;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px;
+      transition: border-color 0.3s;
+    }
+    input:focus {
+      border-color: #f0c040;
+      outline: none;
     }
     button {
       width: 100%;
-      padding: 8px;
-      background: #333;
+      padding: 12px;
+      background: #2a4066;
       color: #fff;
       border: none;
-      border-radius: 4px;
+      border-radius: 8px;
       cursor: pointer;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px;
+      transition: background 0.3s, transform 0.2s;
+      position: relative;
+      z-index: 1;
     }
     button:hover {
-      background: #4a4a4a;
+      background: #3a5088;
+      transform: translateY(-2px);
     }
-    .response, .code-message {
-      margin-top: 16px;
+    .response, .challenge-message {
+      margin-top: 20px;
       white-space: pre-wrap;
+      font-family: 'Roboto', sans-serif;
+      font-size: 14px;
+      color: #c0c0d0;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
     }
     .chatroom {
-      height: 256px;
+      height: 280px;
       overflow-y: auto;
-      background: #1a1a1a;
-      padding: 16px;
-      border-radius: 4px;
-      margin-bottom: 16px;
+      background: rgba(26, 26, 46, 0.9);
+      padding: 15px;
+      border-radius: 10px;
+      margin-bottom: 20px;
+      box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.4);
     }
     .chat-message {
-      margin-bottom: 8px;
+      margin-bottom: 12px;
+      padding: 8px;
+      background: #1a1a2e;
+      border-radius: 6px;
+      font-size: 14px;
     }
     .payment-link {
       display: block;
-      margin-top: 16px;
-      padding: 8px;
+      margin-top: 20px;
+      padding: 14px;
       background: #16a34a;
       color: #fff;
       text-decoration: none;
-      border-radius: 4px;
+      border-radius: 8px;
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px;
+      transition: background 0.3s, transform 0.2s;
     }
     .payment-link:hover {
       background: #22c55e;
+      transform: translateY(-2px);
+    }
+    .timer {
+      font-family: 'Orbitron', sans-serif;
+      font-size: 16px;
+      color: #f0c040;
+      margin-top: 15px;
+      text-shadow: 0 2px 4px rgba(240, 192, 64, 0.3);
     }
     footer {
       color: #6b7280;
       font-size: 12px;
       text-align: center;
-      max-width: 384px;
-      margin-top: 32px;
+      max-width: 400px;
+      margin-top: 30px;
+      font-family: 'Roboto', sans-serif;
     }
     .hint {
-      font-size: 12px;
-      color: #aaa;
-      margin-top: 8px;
+      font-size: 14px;
+      color: #a0a0b0;
+      margin-top: 15px;
+      font-style: italic;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
     }
     .error {
       color: #ef4444;
-      margin-top: 16px;
+      margin-top: 20px;
+      font-weight: 500;
+      text-shadow: 0 1px 3px rgba(239, 68, 68, 0.3);
     }
     .privacy {
       font-size: 12px;
-      margin-top: 16px;
+      margin-top: 20px;
+      font-family: 'Roboto', sans-serif;
+    }
+    .address-input {
+      margin-top: 15px;
+    }
+    .attempts-left {
+      color: #f0c040;
+      font-size: 14px;
+      margin-top: 10px;
     }
   </style>
 </head>
@@ -104,13 +221,45 @@
     let input = '';
     let response = '';
     let showPayment = false;
-    let codeInput = '';
+    let challengeMessage = '';
     let chatMessages = [];
     let chatInput = '';
     let isChatroom = false;
-    let codeMessage = '';
+    let progress = 0;
+    let timer = 24 * 60 * 60; // 24小時倒計時（秒）
     const userId = Math.random().toString(36).substring(2);
     const GAS_URL = 'https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec';
+    let encryptedMessage = generateEncryptedMessage();
+    let keyHint = generateKeyHint();
+    let attemptsLeft = 3;
+
+    function generateEncryptedMessage() {
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789₿S';
+      let message = '';
+      for (let i = 0; i < 10; i++) {
+        message += chars.charAt(Math.floor(Math.random() * chars.length));
+      }
+      return message;
+    }
+
+    function generateKeyHint() {
+      const seed = userId.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0) % 26;
+      return `${seed + 5}`; // 只顯示數字
+    }
+
+    function updateTimer() {
+      const timerElement = document.querySelector('.timer');
+      if (timerElement && timer > 0) {
+        const hours = Math.floor(timer / 3600);
+        const minutes = Math.floor((timer % 3600) / 60);
+        const seconds = timer % 60;
+        timerElement.textContent = `Time remaining: ${hours}h ${minutes}m ${seconds}s`;
+        timer--;
+        setTimeout(updateTimer, 1000);
+      } else if (timerElement) {
+        timerElement.textContent = 'The enigma resets...';
+      }
+    }
 
     function fetchMessages() {
       if (isChatroom) {
@@ -128,29 +277,28 @@
     async function handleSubmit() {
       if (!input) return;
       try {
-        const isCode = /^[a-zA-Z0-9]{16}$/.test(input);
-        if (isCode) {
-          const res = await fetch(`${GAS_URL}?action=verifyCode&code=${input}`);
-          const result = await res.json();
-          if (result.status === 'valid') {
-            isChatroom = true;
-            fetchMessages();
-            codeMessage = result.message;
-          } else {
-            codeMessage = result.message;
-          }
+        const res = await fetch(`${GAS_URL}?action=checkChallenge&userId=${userId}&input=${encodeURIComponent(input)}&encrypted=${encryptedMessage}&attempts=${attemptsLeft}`);
+        const result = await res.json();
+        response = result.response || 'Error: No response.';
+        challengeMessage = result.challengeMessage || '';
+        if (result.progress) {
+          progress = result.progress;
+          if (progress === 1) attemptsLeft = 3; // 重置嘗試次數
         } else {
-          const res = await fetch(`${GAS_URL}?action=checkQuestion&userId=${userId}&question=${encodeURIComponent(input)}`);
-          const result = await res.json();
-          response = result.response || 'Error: No response from server.';
-          showPayment = result.showPayment || false;
-          codeMessage = '';
+          attemptsLeft = result.attemptsLeft || attemptsLeft - 1;
+        }
+        if (attemptsLeft <= 0) {
+          challengeMessage = 'Attempts exhausted. The enigma resets...';
+          progress = 0;
+          encryptedMessage = generateEncryptedMessage();
+          keyHint = generateKeyHint();
+          attemptsLeft = 3;
         }
         input = '';
         render();
       } catch (error) {
         response = 'Error processing request.';
-        codeMessage = '';
+        challengeMessage = '';
         console.error('Submission error:', error);
         render();
       }
@@ -167,6 +315,14 @@
       }
     }
 
+    function handleAddressSubmit() {
+      if (postalAddress) {
+        challengeMessage = `Postal Address submitted: ${postalAddress}. Your limited Trading Card is on its way!`;
+        postalAddress = '';
+        render();
+      }
+    }
+
     function render() {
       root.innerHTML = `
         <div class="container">
@@ -177,27 +333,54 @@
             </div>
             <input id="chatInput" type="text" value="${chatInput}" placeholder="Enter AB12 format...">
             <button onclick="handleChatSubmit()">Send</button>
+            <div class="hint">Discover the secret sequence of your Code?</div>
           ` : `
             <h1>Satoshi's Enigma</h1>
-            <input id="input" type="text" value="${input}" placeholder="Ask a question...">
-            <button onclick="handleSubmit()">Submit</button>
-            ${response ? `<div class="response">${response}</div>` : ''}
-            ${showPayment ? `<a href="https://nowpayments.io/payment/?iid=6068590454" class="payment-link">Support the Legacy ($29.00)</a>` : ''}
-            ${codeMessage ? `<pre class="code-message">${codeMessage}</pre>` : ''}
-            <div class="hint">Uncover hidden truths—ask about my legacy! Future revelations await...</div>
+            <div class="challenge">
+              <div class="challenge-content">
+                ${progress === 0 ? `
+                  <div class="encrypted-message">${encryptedMessage}</div>
+                  <div class="key-hint">${keyHint}</div>
+                  <input id="decodeInput" type="text" value="${input}" placeholder="Decode the message...">
+                  <div class="attempts-left">Attempts left: ${attemptsLeft}</div>
+                ` : ''}
+                <div class="progress">
+                  <div class="progress-bar" style="width: ${progress * 100}%"></div>
+                </div>
+                ${progress === 0 ? `<button onclick="handleSubmit()">Submit</button>` : ''}
+                ${progress === 1 ? `<input id="codeInput" type="text" value="${input}" placeholder="Enter your Code..."><button onclick="handleSubmit()">Redeem</button>` : ''}
+                ${challengeMessage && challengeMessage.includes('Postal Address') ? `
+                  <div class="address-input">
+                    <input id="postalInput" type="text" value="${postalAddress}" placeholder="Enter your Postal Address...">
+                    <button onclick="handleAddressSubmit()">Submit Address</button>
+                  </div>
+                ` : ''}
+                ${response ? `<div class="response">${response}</div>` : ''}
+                ${challengeMessage ? `<pre class="challenge-message">${challengeMessage}</pre>` : ''}
+              </div>
+            </div>
+            ${progress === 1 ? `
+              <a href="https://nowpayments.io/payment/?iid=6068590454" class="payment-link">Claim Your Limited Code ($29.00)</a>
+              <p style="font-size: 12px; color: #a0a0b0;">Limited 100 Codes - Only 50 remain. Unlock your Satoshi Trading Card!</p>
+            ` : ''}
+            <div class="timer"></div>
+            <div class="hint">Nakamoto’s legacy awaits... Decipher the code.</div>
             <div class="privacy"><a href="https://satoshinai.github.io/satoshiai/privacy-policy.html">Privacy Policy</a> | Consent required.</div>
             ${showPayment ? `
               <footer>
-                <p>Disclaimer: Satoshi's Enigma is an experimental game, not a financial product. Codes are unique digital fragments (max 350,000), with no guaranteed value. Participation costs $29.00 (non-refunded). Future use, including potential digital heritage, is speculative. Use at your own risk.</p>
+                <p>Disclaimer: Satoshi's Enigma is experimental. Codes are limited. $29.00 non-refunded. Use at your own risk.</p>
               </footer>
             ` : ''}
           `}
         </div>
       `;
       if (!isChatroom) {
-        document.getElementById('input').addEventListener('input', (e) => { input = e.target.value; });
+        if (progress === 0) document.getElementById('decodeInput')?.addEventListener('input', (e) => { input = e.target.value; });
+        if (progress === 1) document.getElementById('codeInput')?.addEventListener('input', (e) => { input = e.target.value; });
+        if (challengeMessage.includes('Postal Address')) document.getElementById('postalInput')?.addEventListener('input', (e) => { postalAddress = e.target.value; });
+        updateTimer();
       } else {
-        document.getElementById('chatInput').addEventListener('input', (e) => { chatInput = e.target.value; });
+        document.getElementById('chatInput')?.addEventListener('input', (e) => { chatInput = e.target.value; });
       }
     }
 
