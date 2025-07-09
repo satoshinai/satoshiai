@@ -33,6 +33,7 @@
       border: 1px solid rgba(240, 192, 64, 0.1);
       position: relative;
       overflow: hidden;
+      z-index: 1;
     }
     .container::before {
       content: '';
@@ -237,7 +238,7 @@
     const GAS_URL = 'https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec';
     let encryptedMessage = '';
     let keyHint = '';
-    let attemptsLeft = 3; // 恢復為3次
+    let attemptsLeft = 3; // 保持3次
 
     function updateTimer() {
       const timerElement = document.querySelector('.timer');
@@ -269,6 +270,7 @@
     async function fetchInitialData() {
       try {
         const res = await fetch(`${GAS_URL}?action=checkChallenge&userId=${userId}`);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const result = await res.json();
         encryptedMessage = result.encrypted || generateEncryptedMessage();
         keyHint = result.keyHint || generateKeyHint();
@@ -277,10 +279,11 @@
         challengeMessage = result.challengeMessage || '';
         progress = result.progress || 0;
         showPayment = result.showPayment || false;
+        console.log('Initial data:', result); // 調試用
         render();
       } catch (error) {
         console.error('Initial data fetch error:', error);
-        response = 'Error processing request.';
+        response = `Error processing request: ${error.message}`;
         render();
       }
     }
@@ -289,6 +292,7 @@
       if (!input) return;
       try {
         const res = await fetch(`${GAS_URL}?action=checkChallenge&userId=${userId}&input=${encodeURIComponent(input)}&encrypted=${encodeURIComponent(encryptedMessage)}&keyHint=${encodeURIComponent(keyHint)}&attempts=${attemptsLeft}`);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const result = await res.json();
         response = result.response || 'Error: No response.';
         challengeMessage = result.challengeMessage || '';
@@ -306,7 +310,7 @@
         input = '';
         render();
       } catch (error) {
-        response = 'Error processing request.';
+        response = `Error processing request: ${error.message}`;
         challengeMessage = '';
         console.error('Submission error:', error);
         render();
@@ -376,7 +380,7 @@
             <div class="timer"></div>
             <div class="hint">Nakamoto’s legacy awaits... Decipher the code.</div>
             <div class="privacy"><a href="https://satoshinai.github.io/satoshiai/privacy-policy.html" target="_blank">Privacy Policy</a> | Consent required.</div>
-            <div id="userIdDisplay">User ID: ${userId}</div> <!-- 添加USER ID -->
+            <div id="userIdDisplay">User ID: ${userId}</div>
           `}
         </div>
       `;
