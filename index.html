@@ -21,6 +21,8 @@
       margin: 0;
       padding: 0;
       overflow-x: hidden;
+      position: relative;
+      z-index: 0;
     }
     .container {
       max-width: 400px;
@@ -44,7 +46,7 @@
       height: 200%;
       background: radial-gradient(circle, rgba(240, 192, 64, 0.05) 0%, transparent 70%);
       animation: rotate 20s linear infinite;
-      z-index: 0;
+      z-index: -1;
     }
     @keyframes rotate {
       0% { transform: rotate(0deg); }
@@ -57,7 +59,7 @@
       color: #f0c040;
       text-shadow: 0 2px 6px rgba(240, 192, 64, 0.3);
       position: relative;
-      z-index: 1;
+      z-index: 2;
     }
     .challenge {
       margin: 25px 0;
@@ -65,12 +67,12 @@
       background: rgba(26, 26, 46, 0.9);
       border-radius: 10px;
       position: relative;
-      z-index: 1;
+      z-index: 2;
       border-left: 4px solid #f0c040;
     }
     .challenge-content {
       position: relative;
-      z-index: 1;
+      z-index: 2;
     }
     .encrypted-message {
       font-size: 24px;
@@ -110,6 +112,7 @@
       font-family: 'Orbitron', sans-serif;
       font-size: 16px;
       transition: border-color 0.3s;
+      z-index: 2;
     }
     input:focus {
       border-color: #f0c040;
@@ -127,7 +130,7 @@
       font-size: 16px;
       transition: background 0.3s, transform 0.2s;
       position: relative;
-      z-index: 1;
+      z-index: 2;
     }
     button:hover {
       background: #3a5088;
@@ -140,6 +143,7 @@
       font-size: 14px;
       color: #c0c0d0;
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+      z-index: 2;
     }
     .chatroom {
       height: 280px;
@@ -149,6 +153,7 @@
       border-radius: 10px;
       margin-bottom: 20px;
       box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.4);
+      z-index: 2;
     }
     .chat-message {
       margin-bottom: 12px;
@@ -169,7 +174,8 @@
       font-size: 16px;
       transition: background 0.3s, transform 0.2s;
       cursor: pointer;
-      z-index: 2;
+      z-index: 3;
+      position: relative;
     }
     .payment-link:hover {
       background: #22c55e;
@@ -181,6 +187,7 @@
       color: #f0c040;
       margin-top: 15px;
       text-shadow: 0 2px 4px rgba(240, 192, 64, 0.3);
+      z-index: 2;
     }
     footer {
       color: #6b7280;
@@ -189,6 +196,7 @@
       max-width: 400px;
       margin-top: 30px;
       font-family: 'Roboto', sans-serif;
+      z-index: 2;
     }
     .hint {
       font-size: 14px;
@@ -196,12 +204,14 @@
       margin-top: 15px;
       font-style: italic;
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+      z-index: 2;
     }
     .error {
       color: #ef4444;
       margin-top: 20px;
       font-weight: 500;
       text-shadow: 0 1px 3px rgba(239, 68, 68, 0.3);
+      z-index: 2;
     }
     .privacy {
       font-size: 12px;
@@ -212,17 +222,20 @@
     }
     .address-input {
       margin-top: 15px;
+      z-index: 2;
     }
     .attempts-left {
       color: #f0c040;
       font-size: 14px;
       margin-top: 10px;
+      z-index: 2;
     }
     #userIdDisplay {
       font-size: 12px;
       color: #6b7280;
       text-align: center;
       margin-top: 10px;
+      z-index: 2;
     }
   </style>
 </head>
