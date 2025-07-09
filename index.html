@@ -238,7 +238,7 @@
     const GAS_URL = 'https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec';
     let encryptedMessage = '';
     let keyHint = '';
-    let attemptsLeft = 3; // 保持3次
+    let attemptsLeft = 3;
 
     function updateTimer() {
       const timerElement = document.querySelector('.timer');
@@ -298,14 +298,14 @@
         challengeMessage = result.challengeMessage || '';
         if (result.progress) {
           progress = result.progress;
-          if (progress === 1) attemptsLeft = 3; // 重置嘗試次數
+          if (progress === 1) attemptsLeft = 3;
         } else {
           attemptsLeft = result.attemptsLeft || attemptsLeft - 1;
         }
         if (attemptsLeft <= 0) {
           challengeMessage = 'Attempts exhausted. The enigma resets...';
           progress = 0;
-          await fetchInitialData(); // 重置數據
+          await fetchInitialData();
         }
         input = '';
         render();
@@ -379,7 +379,7 @@
             ` : ''}
             <div class="timer"></div>
             <div class="hint">Nakamoto’s legacy awaits... Decipher the code.</div>
-            <div class="privacy"><a href="https://satoshinai.github.io/satoshiai/privacy-policy.html" target="_blank">Privacy Policy</a> | Consent required.</div>
+            <div class="privacy"><a href="https://satoshinai.github.io/satoshiai/privacy-policy.html" target="_blank" style="color: #a0a0b0; text-decoration: underline;">Privacy Policy</a> | Consent required.</div>
             <div id="userIdDisplay">User ID: ${userId}</div>
           `}
         </div>
