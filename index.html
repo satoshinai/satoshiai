@@ -213,6 +213,12 @@
       font-size: 14px;
       margin-top: 10px;
     }
+    #userIdDisplay {
+      font-size: 12px;
+      color: #6b7280;
+      text-align: center;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -229,23 +235,9 @@
     let timer = 24 * 60 * 60; // 24小時倒計時（秒）
     const userId = Math.random().toString(36).substring(2);
     const GAS_URL = 'https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec';
-    let encryptedMessage = generateEncryptedMessage();
-    let keyHint = generateKeyHint();
-    let attemptsLeft = 3;
-
-    function generateEncryptedMessage() {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789₿S';
-      let message = '';
-      for (let i = 0; i < 10; i++) {
-        message += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return message;
-    }
-
-    function generateKeyHint() {
-      const seed = userId.split('').reduce((sum, char) => sum + char.charCodeAt(0), 0) % 26;
-      return `${seed + 5}`; // 只顯示數字
-    }
+    let encryptedMessage = '';
+    let keyHint = '';
+    let attemptsLeft = 3; // 恢復為3次
 
     function updateTimer() {
       const timerElement = document.querySelector('.timer');
@@ -274,10 +266,29 @@
       }
     }
 
+    async function fetchInitialData() {
+      try {
+        const res = await fetch(`${GAS_URL}?action=checkChallenge&userId=${userId}`);
+        const result = await res.json();
+        encryptedMessage = result.encrypted || generateEncryptedMessage();
+        keyHint = result.keyHint || generateKeyHint();
+        attemptsLeft = result.attemptsLeft || 3;
+        response = result.response || '';
+        challengeMessage = result.challengeMessage || '';
+        progress = result.progress || 0;
+        showPayment = result.showPayment || false;
+        render();
+      } catch (error) {
+        console.error('Initial data fetch error:', error);
+        response = 'Error processing request.';
+        render();
+      }
+    }
+
     async function handleSubmit() {
       if (!input) return;
       try {
-        const res = await fetch(`${GAS_URL}?action=checkChallenge&userId=${userId}&input=${encodeURIComponent(input)}&encrypted=${encryptedMessage}&attempts=${attemptsLeft}`);
+        const res = await fetch(`${GAS_URL}?action=checkChallenge&userId=${userId}&input=${encodeURIComponent(input)}&encrypted=${encodeURIComponent(encryptedMessage)}&keyHint=${encodeURIComponent(keyHint)}&attempts=${attemptsLeft}`);
         const result = await res.json();
         response = result.response || 'Error: No response.';
         challengeMessage = result.challengeMessage || '';
@@ -290,9 +301,7 @@
         if (attemptsLeft <= 0) {
           challengeMessage = 'Attempts exhausted. The enigma resets...';
           progress = 0;
-          encryptedMessage = generateEncryptedMessage();
-          keyHint = generateKeyHint();
-          attemptsLeft = 3;
+          await fetchInitialData(); // 重置數據
         }
         input = '';
         render();
@@ -324,6 +333,7 @@
     }
 
     function render() {
+      const root = document.getElementById('root');
       root.innerHTML = `
         <div class="container">
           ${isChatroom ? `
@@ -365,12 +375,8 @@
             ` : ''}
             <div class="timer"></div>
             <div class="hint">Nakamoto’s legacy awaits... Decipher the code.</div>
-            <div class="privacy"><a href="https://satoshinai.github.io/satoshiai/privacy-policy.html">Privacy Policy</a> | Consent required.</div>
-            ${showPayment ? `
-              <footer>
-                <p>Disclaimer: Satoshi's Enigma is experimental. Codes are limited. $29.00 non-refunded. Use at your own risk.</p>
-              </footer>
-            ` : ''}
+            <div class="privacy"><a href="https://satoshinai.github.io/satoshiai/privacy-policy.html" target="_blank">Privacy Policy</a> | Consent required.</div>
+            <div id="userIdDisplay">User ID: ${userId}</div> <!-- 添加USER ID -->
           `}
         </div>
       `;
@@ -384,7 +390,9 @@
       }
     }
 
-    render();
+    let postalAddress = '';
+    fetchInitialData();
+    fetchMessages();
   </script>
 </body>
 </html>
