@@ -1,415 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta http-equiv="Cache-Control" content="public, max-age=3600">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Satoshi's Enigma</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Roboto:wght@300;400&display=swap" rel="stylesheet">
+  <title>The Nakamoto Enigma</title>
   <style>
-    /* 保留原有CSS，無改動 */
-    body {
-      background: linear-gradient(135deg, #0a0a1a, #1a2a3a);
-      background-size: cover;
-      background-attachment: fixed;
-      color: #e0e0f0;
-      font-family: 'Roboto', sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 100vh;
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;
-      position: relative;
-      z-index: 0;
-    }
-    .container {
-      max-width: 400px;
-      width: 100%;
-      text-align: center;
-      background: rgba(10, 10, 26, 0.85);
-      padding: 25px;
-      border-radius: 12px;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.7);
-      border: 1px solid rgba(240, 192, 64, 0.1);
-      position: relative;
-      overflow: hidden;
-      z-index: 1;
-    }
-    .container::before {
-      content: '';
-      position: absolute;
-      top: -50%;
-      left: -50%;
-      width: 200%;
-      height: 200%;
-      background: radial-gradient(circle, rgba(240, 192, 64, 0.05) 0%, transparent 70%);
-      animation: rotate 20s linear infinite;
-      z-index: -1;
-    }
-    @keyframes rotate {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    h1 {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 32px;
-      margin-bottom: 25px;
-      color: #f0c040;
-      text-shadow: 0 2px 6px rgba(240, 192, 64, 0.3);
-      position: relative;
-      z-index: 2;
-    }
-    .challenge {
-      margin: 25px 0;
-      padding: 20px;
-      background: rgba(26, 26, 46, 0.9);
-      border-radius: 10px;
-      position: relative;
-      z-index: 2;
-      border-left: 4px solid #f0c040;
-    }
-    .challenge-content {
-      position: relative;
-      z-index: 2;
-    }
-    .encrypted-message {
-      font-size: 24px;
-      margin: 15px 0;
-      color: #f0c040;
-      font-family: 'Orbitron', sans-serif;
-    }
-    .key-hint {
-      font-size: 18px;
-      margin: 10px 0;
-      color: #a0a0b0;
-      font-style: italic;
-    }
-    .progress {
-      width: 100%;
-      height: 12px;
-      background: #2a2a4a;
-      margin: 15px 0;
-      border-radius: 6px;
-      overflow: hidden;
-    }
-    .progress-bar {
-      height: 100%;
-      background: linear-gradient(90deg, #f0c040, #d4a017);
-      width: 0;
-      border-radius: 6px;
-      transition: width 1.2s ease-in-out;
-    }
-    input {
-      width: 100%;
-      padding: 12px;
-      background: #1a1a2e;
-      border: 2px solid #3a3a5a;
-      color: #e0e0f0;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 16px;
-      transition: border-color 0.3s;
-      z-index: 2;
-    }
-    input:focus {
-      border-color: #f0c040;
-      outline: none;
-    }
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #2a4066;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 16px;
-      transition: background 0.3s, transform 0.2s;
-      position: relative;
-      z-index: 2;
-    }
-    button:hover {
-      background: #3a5088;
-      transform: translateY(-2px);
-    }
-    .response, .challenge-message {
-      margin-top: 20px;
-      white-space: pre-wrap;
-      font-family: 'Roboto', sans-serif;
-      font-size: 14px;
-      color: #c0c0d0;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-      z-index: 2;
-    }
-    .chatroom {
-      height: 280px;
-      overflow-y: auto;
-      background: rgba(26, 26, 46, 0.9);
-      padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 20px;
-      box-shadow: inset 0 4px 10px rgba(0, 0, 0, 0.4);
-      z-index: 2;
-    }
-    .chat-message {
-      margin-bottom: 12px;
-      padding: 8px;
-      background: #1a1a2e;
-      border-radius: 6px;
-      font-size: 14px;
-    }
-    .payment-link {
-      display: block;
-      margin-top: 20px;
-      padding: 14px;
-      background: #16a34a;
-      color: #fff;
-      text-decoration: none;
-      border-radius: 8px;
-      font-family: 'Orbitron', sans-serif;
-      font-size: 16px;
-      transition: background 0.3s, transform 0.2s;
-      cursor: pointer;
-      z-index: 3;
-      position: relative;
-    }
-    .payment-link:hover {
-      background: #22c55e;
-      transform: translateY(-2px);
-    }
-    .timer {
-      font-family: 'Orbitron', sans-serif;
-      font-size: 16px;
-      color: #f0c040;
-      margin-top: 15px;
-      text-shadow: 0 2px 4px rgba(240, 192, 64, 0.3);
-      z-index: 2;
-    }
-    footer {
-      color: #6b7280;
-      font-size: 12px;
-      text-align: center;
-      max-width: 400px;
-      margin-top: 30px;
-      font-family: 'Roboto', sans-serif;
-      z-index: 2;
-    }
-    .hint {
-      font-size: 14px;
-      color: #a0a0b0;
-      margin-top: 15px;
-      font-style: italic;
-      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-      z-index: 2;
-    }
-    .error {
-      color: #ef4444;
-      margin-top: 20px;
-      font-weight: 500;
-      text-shadow: 0 1px 3px rgba(239, 68, 68, 0.3);
-      z-index: 2;
-    }
-    .privacy {
-      font-size: 12px;
-      margin-top: 20px;
-      font-family: 'Roboto', sans-serif;
-      position: relative;
-      z-index: 3;
-    }
-    .address-input {
-      margin-top: 15px;
-      z-index: 2;
-    }
-    .attempts-left {
-      color: #f0c040;
-      font-size: 14px;
-      margin-top: 10px;
-      z-index: 2;
-    }
-    #userIdDisplay {
-      font-size: 12px;
-      color: #6b7280;
-      text-align: center;
-      margin-top: 10px;
-      z-index: 2;
-    }
+    body { font-family: 'Courier New', monospace; background: #1a1a1a; color: #e0e0e0; text-align: center; padding: 50px; }
+    h1 { font-size: 2.5em; color: #ffcc00; }
+    .container { max-width: 600px; margin: 0 auto; }
+    input, button { padding: 10px; margin: 5px; font-size: 1em; }
+    #result { margin-top: 20px; font-style: italic; }
+    .hidden { display: none; }
   </style>
 </head>
 <body>
-  <div id="root"></div>
+  <div class="container">
+    <h1>The Nakamoto Cipher</h1>
+    <p>Unravel the secrets of Satoshi...</p>
+    <div id="challenge">
+      <p>Encrypted Code: <span id="encrypted"></span></p>
+      <p>Key Hint: <span id="keyHint"></span></p>
+      <p>Attempts Left: <span id="attemptsLeft">3</span></p>
+      <input type="text" id="input" placeholder="Enter decoded message">
+      <button onclick="submitChallenge()">Decrypt</button>
+      <p id="result"></p>
+    </div>
+    <div id="payment" class="hidden">
+      <p>Payment required to proceed. Visit <a href="https://nowspayment.com" target="_blank">Nowspayment</a>.</p>
+      <button onclick="checkPaymentStatus()">Check Status</button>
+    </div>
+    <p>User ID: <span id="userId"></span></p>
+  </div>
+
   <script>
-    let input = '';
-    let response = '';
-    let showPayment = false;
-    let challengeMessage = '';
-    let chatMessages = [];
-    let chatInput = '';
-    let isChatroom = false;
-    let progress = 0;
-    let timer = 24 * 60 * 60; // 24小時倒計時（秒）
-    const userId = Math.random().toString(36).substring(2);
-    const GAS_URL = 'https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec';
-    let encryptedMessage = '';
-    let keyHint = '';
-    let attemptsLeft = 3;
+    const userId = 'imid5grbup'; // 示例User ID，可動態生成
+    document.getElementById('userId').textContent = userId;
 
-    function updateTimer() {
-      const timerElement = document.querySelector('.timer');
-      if (timerElement && timer > 0) {
-        const hours = Math.floor(timer / 3600);
-        const minutes = Math.floor((timer % 3600) / 60);
-        const seconds = timer % 60;
-        timerElement.textContent = `Time remaining: ${hours}h ${minutes}m ${seconds}s`;
-        timer--;
-        setTimeout(updateTimer, 1000);
-      } else if (timerElement) {
-        timerElement.textContent = 'The enigma resets...';
-      }
-    }
-
-    function fetchMessages() {
-      if (isChatroom) {
-        fetch(`${GAS_URL}?action=getMessages`)
-          .then(res => res.json())
-          .then(data => {
-            chatMessages = data.messages || [];
-            render();
-          })
-          .catch(error => console.error('Error fetching messages:', error));
-        setTimeout(fetchMessages, 5000);
-      }
-    }
-
-    async function fetchInitialData() {
-      try {
-        const res = await fetch(`${GAS_URL}?action=getInitialData&userId=${userId}`);
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        const result = await res.json();
-        encryptedMessage = result.encrypted;
-        keyHint = result.keyHint;
-        attemptsLeft = result.attemptsLeft;
-        userId = result.userId; // 更新userId
-        console.log('Initial data:', result);
-        render();
-      } catch (error) {
-        console.error('Initial data fetch error:', error);
-        response = `Error fetching initial data: ${error.message}`;
-        render();
-      }
-    }
-
-    async function handleSubmit() {
-      if (!input) return;
-      try {
-        const res = await fetch(`${GAS_URL}?action=checkChallenge&userId=${userId}&input=${encodeURIComponent(input)}&encrypted=${encodeURIComponent(encryptedMessage)}&keyHint=${encodeURIComponent(keyHint)}&attempts=${attemptsLeft}`);
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        const result = await res.json();
-        response = result.response || 'Error: No response.';
-        challengeMessage = result.challengeMessage || '';
-        progress = result.progress || 0;
-        attemptsLeft = result.attemptsLeft || (progress === 0 ? attemptsLeft - 1 : 3);
-        encryptedMessage = result.encrypted || encryptedMessage;
-        keyHint = result.keyHint || keyHint;
-        if (attemptsLeft <= 0 && progress === 0) {
-          challengeMessage = 'Attempts exhausted. The enigma resets...';
-          progress = 0;
-          await fetchInitialData();
+    fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}`)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('encrypted').textContent = data.encrypted;
+        document.getElementById('keyHint').textContent = data.keyHint;
+        document.getElementById('attemptsLeft').textContent = data.attemptsLeft;
+        if (data.progress === 1) {
+          document.getElementById('challenge').classList.add('hidden');
+          document.getElementById('payment').classList.remove('hidden');
         }
-        input = '';
-        render();
-      } catch (error) {
-        response = `Error processing request: ${error.message}`;
-        challengeMessage = '';
-        console.error('Submission error:', error);
-        render();
-      }
+      });
+
+    function submitChallenge() {
+      const input = document.getElementById('input').value;
+      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}&input=${input}&encrypted=${document.getElementById('encrypted').textContent}&keyHint=${document.getElementById('keyHint').textContent}&attempts=${document.getElementById('attemptsLeft').textContent}`)
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('result').textContent = data.challengeMessage || data.response;
+          document.getElementById('attemptsLeft').textContent = data.attemptsLeft;
+          if (data.progress === 1) {
+            document.getElementById('challenge').classList.add('hidden');
+            document.getElementById('payment').classList.remove('hidden');
+          }
+          if (data.encrypted) document.getElementById('encrypted').textContent = data.encrypted;
+          if (data.keyHint) document.getElementById('keyHint').textContent = data.keyHint;
+        });
     }
 
-    async function handleChatSubmit() {
-      if (!chatInput.match(/^[A-Z]{2}\d{2}$/)) return;
-      try {
-        await fetch(`${GAS_URL}?action=addMessage&text=${chatInput}`);
-        chatInput = '';
-        fetchMessages();
-      } catch (error) {
-        console.error('Chat error:', error);
-      }
+    function checkPaymentStatus() {
+      // 模擬Webhook檢查，實際需整合Nowspayment API
+      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=payment&userId=${userId}&transactionId=TEST123`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.status === 'success') {
+            alert('Payment confirmed. Code sent to your email.');
+          }
+        });
     }
-
-    function handleAddressSubmit() {
-      if (postalAddress) {
-        challengeMessage = `Postal Address submitted: ${postalAddress}. Your limited Trading Card is on its way!`;
-        postalAddress = '';
-        render();
-      }
-    }
-
-    function render() {
-      const root = document.getElementById('root');
-      root.innerHTML = `
-        <div class="container">
-          ${isChatroom ? `
-            <h1>Chatroom</h1>
-            <div class="chatroom">
-              ${chatMessages.map(msg => `<div class="chat-message">${msg}</div>`).join('')}
-            </div>
-            <input id="chatInput" type="text" value="${chatInput}" placeholder="Enter AB12 format...">
-            <button onclick="handleChatSubmit()">Send</button>
-            <div class="hint">Discover the secret sequence of your Code?</div>
-          ` : `
-            <h1>Satoshi's Enigma</h1>
-            <div class="challenge">
-              <div class="challenge-content">
-                ${progress === 0 ? `
-                  <div class="encrypted-message">${encryptedMessage}</div>
-                  <div class="key-hint">${keyHint}</div>
-                  <input id="decodeInput" type="text" value="${input}" placeholder="Decode the message...">
-                  <div class="attempts-left">Attempts left: ${attemptsLeft}</div>
-                ` : ''}
-                <div class="progress">
-                  <div class="progress-bar" style="width: ${progress * 100}%"></div>
-                </div>
-                ${progress === 0 ? `<button onclick="handleSubmit()">Submit</button>` : ''}
-                ${progress === 1 ? `<input id="codeInput" type="text" value="${input}" placeholder="Enter your Code..."><button onclick="handleSubmit()">Redeem</button>` : ''}
-                ${challengeMessage && challengeMessage.includes('Postal Address') ? `
-                  <div class="address-input">
-                    <input id="postalInput" type="text" value="${postalAddress}" placeholder="Enter your Postal Address...">
-                    <button onclick="handleAddressSubmit()">Submit Address</button>
-                  </div>
-                ` : ''}
-                ${response ? `<div class="response">${response}</div>` : ''}
-                ${challengeMessage ? `<pre class="challenge-message">${challengeMessage}</pre>` : ''}
-              </div>
-            </div>
-            ${progress === 1 ? `
-              <a href="https://nowpayments.io/payment/?iid=6068590454" class="payment-link" target="_blank">Unlock the Enigma's Secret</a>
-              <p style="font-size: 12px; color: #a0a0b0;">Embark on a journey to unveil a rare artifact, shrouded in Nakamoto's legacy...</p>
-            ` : ''}
-            <div class="timer"></div>
-            <div class="hint">Nakamoto’s legacy awaits... Decipher the code.</div>
-            <div class="privacy"><a href="https://satoshinai.github.io/satoshiai/privacy-policy.html" target="_blank" style="color: #a0a0b0; text-decoration: underline; cursor: pointer; z-index: 3; position: relative;">Privacy Policy</a> | Consent required.</div>
-            <div id="userIdDisplay">User ID: ${userId}</div>
-          `}
-        </div>
-      `;
-      if (!isChatroom) {
-        if (progress === 0) document.getElementById('decodeInput')?.addEventListener('input', (e) => { input = e.target.value; });
-        if (progress === 1) document.getElementById('codeInput')?.addEventListener('input', (e) => { input = e.target.value; });
-        if (challengeMessage.includes('Postal Address')) document.getElementById('postalInput')?.addEventListener('input', (e) => { postalAddress = e.target.value; });
-        updateTimer();
-      } else {
-        document.getElementById('chatInput')?.addEventListener('input', (e) => { chatInput = e.target.value; });
-      }
-    }
-
-    let postalAddress = '';
-    fetchInitialData();
-    fetchMessages();
   </script>
 </body>
 </html>
