@@ -1,56 +1,36 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <base target="_top">
-    <style>
-      body { font-family: Arial, sans-serif; margin: 20px; }
-      .input-group { margin: 10px 0; }
-      label { display: inline-block; width: 100px; }
-      input { padding: 5px; }
-      button { padding: 5px 10px; }
-      #result { margin-top: 10px; color: #333; }
-      #address { display: none; }
-    </style>
-  </head>
-  <body>
-    <h2>Redeem Your Code</h2>
-    <div id="redeem">
-      <div class="input-group">
-        <label>Enter Code:</label><input type="text" id="codeInput">
-      </div>
-      <button onclick="submitCode()">Submit</button>
-      <div id="address" class="input-group">
-        <label>Postal Address:</label><input type="text" id="postalInput">
-        <button onclick="submitAddress()">Confirm</button>
-      </div>
-      <div id="result"></div>
-    </div>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nakamoto Redeem Portal</title>
+  <style>
+    body { font-family: 'Courier New', monospace; background: #1a1a1a; color: #e0e0e0; text-align: center; padding: 50px; }
+    h1 { color: #ffcc00; }
+    input, button { padding: 10px; margin: 5px; font-size: 1em; }
+    #result { margin-top: 20px; }
+  </style>
+</head>
+<body>
+  <h1>The Nakamoto Redeem Portal</h1>
+  <p>Offer your sanctuary to claim the Relic...</p>
+  <input type="text" id="code" placeholder="Enter reverse Cipher">
+  <input type="text" id="address" placeholder="Sanctuary Address">
+  <button onclick="submitRedeem()">Claim Relic</button>
+  <p id="result"></p>
 
-    <script>
-      function submitCode() {
-        const code = document.getElementById('codeInput').value;
-        google.script.run.withSuccessHandler(updateResult).handleRedeem({ code: code });
+  <script>
+    function submitRedeem() {
+      const code = document.getElementById('code').value;
+      const address = document.getElementById('address').value;
+      if (!code || !address) {
+        document.getElementById('result').textContent = 'Both Cipher and Sanctuary are required.';
+        return;
       }
-
-      function submitAddress() {
-        const code = document.getElementById('codeInput').value;
-        const address = document.getElementById('postalInput').value;
-        google.script.run.withSuccessHandler(updateResult).handleRedeemAddress({ code: code, address: address });
-      }
-
-      function updateResult(data) {
-        const resultDiv = document.getElementById('result');
-        resultDiv.innerHTML = data.message;
-        if (data.showAddress) {
-          document.getElementById('address').style.display = 'block';
-        } else if (data.chatroom) {
-          resultDiv.innerHTML += '<br>Entering xAI Chatroom... <a href="https://x.ai/chat" target="_blank">Go to Chat</a>';
-        }
-      }
-    </script>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-    <script>
-      google.script.url = function() { return 'https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec'; };
-    </script>
-  </body>
+      google.script.run.withSuccessHandler(data => {
+        document.getElementById('result').textContent = data.message;
+      }).processRedeem(code, address);
+    }
+  </script>
+</body>
 </html>
