@@ -26,15 +26,15 @@
       <p id="result"></p>
     </div>
     <div id="payment" class="hidden">
-      <p>Payment required to proceed. Pay your tribute <a href="#" id="paymentLink">here</a>.</p>
-      <button onclick="checkPaymentStatus()">Check Oracle's Seal</button>
+      <p>Payment required to proceed. <a href="#" id="paymentLink">Click to pay</a>.</p>
+      <button onclick="checkPaymentStatus()">Check Status</button>
     </div>
     <p>User ID: <span id="userId"></span></p>
-    <p><a href="https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?privacy" target="_blank">Privacy Veil</a></p>
+    <p><a href="https://satoshinai.github.io/satoshiai/privacy-policy.html" target="_blank">Privacy Veil</a></p>
   </div>
 
   <script>
-    const userId = 'imid5grbup';
+    const userId = 'imid5grbup'; // 示例User ID，可動態生成
     document.getElementById('userId').textContent = userId;
 
     fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}`)
@@ -51,11 +51,7 @@
 
     function submitChallenge() {
       const input = document.getElementById('input').value;
-      if (!input) {
-        document.getElementById('result').textContent = 'Enter a decoded message.';
-        return;
-      }
-      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}&input=${encodeURIComponent(input)}&encrypted=${document.getElementById('encrypted').textContent}&keyHint=${document.getElementById('keyHint').textContent}&attempts=${document.getElementById('attemptsLeft').textContent}`)
+      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}&input=${input}&encrypted=${document.getElementById('encrypted').textContent}&keyHint=${document.getElementById('keyHint').textContent}&attempts=${document.getElementById('attemptsLeft').textContent}`)
         .then(response => response.json())
         .then(data => {
           document.getElementById('result').textContent = data.challengeMessage || data.response;
@@ -63,35 +59,27 @@
           if (data.progress === 1) {
             document.getElementById('challenge').classList.add('hidden');
             document.getElementById('payment').classList.remove('hidden');
+            document.getElementById('paymentLink').href = '#'; // 暫時無連結
           }
           if (data.encrypted) document.getElementById('encrypted').textContent = data.encrypted;
           if (data.keyHint) document.getElementById('keyHint').textContent = data.keyHint;
-        })
-        .catch(error => {
-          document.getElementById('result').textContent = 'Error decoding: ' + error.message;
-          Logger.log('Fetch error: ' + error.message);
         });
     }
 
     function checkPaymentStatus() {
-      const transactionId = '6068590454'; // 使用你指定嘅 ID
+      const userId = document.getElementById('userId').textContent;
+      const transactionId = `TX${Math.floor(Math.random() * 1000000)}`;
       const paymentLink = `https://nowpayments.io/payment/?iid=${transactionId}`;
-      document.getElementById('paymentLink').href = paymentLink;
-      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=payment&userId=${userId}&transactionId=${transactionId}`)
+      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=payment&userId=${userId}&transactionId=${transactionId}&amount=29.00&email=test@example.com&consent=true`)
         .then(response => response.json())
         .then(data => {
-          if (data.status === 'pending') {
+          if (data.status === 'success') {
             const code = data.code;
             const reverseCode = code.split('').reverse().join('');
-            alert(`Payment initiated. Use reverse Cipher ${reverseCode} to enter the Sanctuary. Pay your tribute here: ${paymentLink}`);
+            document.getElementById('paymentLink').href = data.message.split('Payment: ')[1]; // 提取支付URL
+            alert(`Payment confirmed. Use reverse Cipher ${reverseCode} to enter the Sanctuary.`);
             window.location.href = 'https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycbw1nkaXxivoJNpWgzCtGYtCyeZMKv1NpofZUBtO_XEULMx-q4QKGmMe2Gru5Q1Sakg6/exec';
-          } else {
-            alert('Payment setup failed. Consult the Oracle...');
           }
-        })
-        .catch(error => {
-          alert('Error checking payment: ' + error.message);
-          Logger.log('Payment fetch error: ' + error.message);
         });
     }
   </script>
