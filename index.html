@@ -32,48 +32,55 @@
     <p>User ID: <span id="userId"></span></p>
   </div>
 
-  <script>
-    const userId = 'imid5grbup'; // 示例User ID，可動態生成
-    document.getElementById('userId').textContent = userId;
+ <script>
+  const userId = 'imid5grbup'; // 示例User ID
+  document.getElementById('userId').textContent = userId;
 
-    fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}`)
+  fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}`)
+    .then(response => response.json())
+    .then(data => {
+      document.getElementById('encrypted').textContent = data.encrypted;
+      document.getElementById('keyHint').textContent = data.keyHint;
+      document.getElementById('attemptsLeft').textContent = data.attemptsLeft;
+      if (data.progress === 1) {
+        document.getElementById('challenge').classList.add('hidden');
+        document.getElementById('payment').classList.remove('hidden');
+      }
+    });
+
+  function submitChallenge() {
+    const input = document.getElementById('input').value;
+    fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}&input=${input}&encrypted=${document.getElementById('encrypted').textContent}&keyHint=${document.getElementById('keyHint').textContent}&attempts=${document.getElementById('attemptsLeft').textContent}`)
       .then(response => response.json())
       .then(data => {
-        document.getElementById('encrypted').textContent = data.encrypted;
-        document.getElementById('keyHint').textContent = data.keyHint;
+        document.getElementById('result').textContent = data.challengeMessage || data.response;
         document.getElementById('attemptsLeft').textContent = data.attemptsLeft;
         if (data.progress === 1) {
           document.getElementById('challenge').classList.add('hidden');
           document.getElementById('payment').classList.remove('hidden');
         }
+        if (data.encrypted) document.getElementById('encrypted').textContent = data.encrypted;
+        if (data.keyHint) document.getElementById('keyHint').textContent = data.keyHint;
       });
+  }
 
-    function submitChallenge() {
-      const input = document.getElementById('input').value;
-      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}&input=${input}&encrypted=${document.getElementById('encrypted').textContent}&keyHint=${document.getElementById('keyHint').textContent}&attempts=${document.getElementById('attemptsLeft').textContent}`)
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById('result').textContent = data.challengeMessage || data.response;
-          document.getElementById('attemptsLeft').textContent = data.attemptsLeft;
-          if (data.progress === 1) {
-            document.getElementById('challenge').classList.add('hidden');
-            document.getElementById('payment').classList.remove('hidden');
-          }
-          if (data.encrypted) document.getElementById('encrypted').textContent = data.encrypted;
-          if (data.keyHint) document.getElementById('keyHint').textContent = data.keyHint;
-        });
-    }
-
-    function checkPaymentStatus() {
-      // 模擬Webhook檢查，實際需整合Nowspayment API
-      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=payment&userId=${userId}&transactionId=TEST123`)
-        .then(response => response.json())
-        .then(data => {
-          if (data.status === 'success') {
-            alert('Payment confirmed. Code sent to your email.');
-          }
-        });
-    }
+  function checkPaymentStatus() {
+    const transactionId = `TX${Math.floor(Math.random() * 1000000)}`; // 動態生成交易ID
+    const paymentLink = `https://nowpayments.io/payment/?iid=${transactionId}`; // 使用提供嘅模板
+    fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=payment&userId=${userId}&transactionId=${transactionId}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.status === 'success') {
+          const code = data.code;
+          const reverseCode = code.split('').reverse().join('');
+          alert(`Payment initiated. Use reverse Cipher ${reverseCode} to enter the Sanctuary. Pay here: ${paymentLink}`);
+          window.location.href = 'https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycbw1nkaXxivoJNpWgzCtGYtCyeZMKv1NpofZUBtO_XEULMx-q4QKGmMe2Gru5Q1Sakg6/exec';
+        } else {
+          alert('Payment setup failed. Consult the Oracle...');
+        }
+      });
+  }
+</script>
   </script>
 </body>
 </html>
