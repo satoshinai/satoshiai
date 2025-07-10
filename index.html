@@ -30,7 +30,7 @@
       <button onclick="checkPaymentStatus()">Check Oracle's Seal</button>
     </div>
     <p>User ID: <span id="userId"></span></p>
-    <p><a href="https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?privacy" target="_blank">Privacy Veil</a></p> <!-- 添加 Privacy Page -->
+    <p><a href="https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?privacy" target="_blank">Privacy Veil</a></p>
   </div>
 
   <script>
@@ -51,7 +51,11 @@
 
     function submitChallenge() {
       const input = document.getElementById('input').value;
-      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}&input=${input}&encrypted=${document.getElementById('encrypted').textContent}&keyHint=${document.getElementById('keyHint').textContent}&attempts=${document.getElementById('attemptsLeft').textContent}`)
+      if (!input) {
+        document.getElementById('result').textContent = 'Enter a decoded message.';
+        return;
+      }
+      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}&input=${encodeURIComponent(input)}&encrypted=${document.getElementById('encrypted').textContent}&keyHint=${document.getElementById('keyHint').textContent}&attempts=${document.getElementById('attemptsLeft').textContent}`)
         .then(response => response.json())
         .then(data => {
           document.getElementById('result').textContent = data.challengeMessage || data.response;
@@ -62,11 +66,15 @@
           }
           if (data.encrypted) document.getElementById('encrypted').textContent = data.encrypted;
           if (data.keyHint) document.getElementById('keyHint').textContent = data.keyHint;
+        })
+        .catch(error => {
+          document.getElementById('result').textContent = 'Error decoding: ' + error.message;
+          Logger.log('Fetch error: ' + error.message);
         });
     }
 
     function checkPaymentStatus() {
-      const transactionId = `TX${Math.floor(Math.random() * 1000000)}`;
+      const transactionId = '6068590454'; // 使用你指定嘅 ID
       const paymentLink = `https://nowpayments.io/payment/?iid=${transactionId}`;
       document.getElementById('paymentLink').href = paymentLink;
       fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=payment&userId=${userId}&transactionId=${transactionId}`)
@@ -80,6 +88,10 @@
           } else {
             alert('Payment setup failed. Consult the Oracle...');
           }
+        })
+        .catch(error => {
+          alert('Error checking payment: ' + error.message);
+          Logger.log('Payment fetch error: ' + error.message);
         });
     }
   </script>
