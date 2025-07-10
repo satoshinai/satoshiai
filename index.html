@@ -30,10 +30,11 @@
       <button onclick="checkPaymentStatus()">Check Oracle's Seal</button>
     </div>
     <p>User ID: <span id="userId"></span></p>
+    <p><a href="https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?privacy" target="_blank">Privacy Veil</a></p> <!-- 添加 Privacy Page -->
   </div>
 
   <script>
-    const userId = 'imid5grbup'; // 示例User ID，可動態生成
+    const userId = 'imid5grbup';
     document.getElementById('userId').textContent = userId;
 
     fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}`)
@@ -65,8 +66,8 @@
     }
 
     function checkPaymentStatus() {
-      const transactionId = `TX${Math.floor(Math.random() * 1000000)}`; // 動態生成交易ID
-      const paymentLink = `https://nowpayments.io/payment/?iid=${transactionId}`; // 使用 Nowspayments 模板
+      const transactionId = `TX${Math.floor(Math.random() * 1000000)}`;
+      const paymentLink = `https://nowpayments.io/payment/?iid=${transactionId}`;
       document.getElementById('paymentLink').href = paymentLink;
       fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=payment&userId=${userId}&transactionId=${transactionId}`)
         .then(response => response.json())
