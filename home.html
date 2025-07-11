@@ -3,292 +3,317 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>The Nakamoto Enigma</title>
+  <title>Nakamoto Enigma - Challenge</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Courier New', monospace; background: #1a1a1a; color: #e0e0e0; text-align: center; padding: 50px; }
-    h1 { font-size: 2.5em; color: #ffcc00; }
-    .container { max-width: 600px; margin: 0 auto; }
-    input, button { padding: 10px; margin: 5px; font-size: 1em; }
-    #result { margin-top: 20px; font-style: italic; }
-    #winners { margin-top: 20px; }
-    .hidden { display: none; }
-    .success { color: #00ff00; }
-    .share-buttons { display: flex; justify-content: center; gap: 10px; }
-    canvas { display: none; }
-    #chatbox { margin-top: 20px; }
-    #messages { max-height: 200px; overflow-y: auto; border: 1px solid #ffcc00; padding: 10px; }
+    body {
+      background: #0d0d0d;
+      color: #ffcc00;
+      font-family: 'Orbitron', monospace;
+      margin: 0;
+      padding: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      text-align: center;
+      max-width: 600px;
+      width: 100%;
+    }
+    h1 {
+      font-size: 2em;
+      text-shadow: 0 0 10px #ffcc00;
+    }
+    p, input, button {
+      font-family: 'Orbitron', monospace;
+    }
+    input {
+      padding: 10px;
+      margin: 10px;
+      background: #1a1a1a;
+      border: 2px solid #ffcc00;
+      color: #ffcc00;
+      font-size: 1em;
+    }
+    button {
+      padding: 12px 24px;
+      margin: 10px;
+      background: transparent;
+      border: 2px solid #ffcc00;
+      color: #ffcc00;
+      cursor: pointer;
+      font-size: 1em;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 10px #ffcc00;
+    }
+    button:hover {
+      background: #ffcc00;
+      color: #0d0d0d;
+      box-shadow: 0 0 20px #ffcc00;
+    }
+    #success, #finalSuccess {
+      display: none;
+    }
+    #messages {
+      margin-top: 20px;
+      text-align: left;
+    }
+    .share-selector {
+      display: none;
+      position: absolute;
+      background: #1a1a1a;
+      border: 2px solid #ffcc00;
+      padding: 10px;
+      margin-top: 5px;
+    }
+    .share-selector button {
+      display: block;
+      width: 100%;
+      margin: 5px 0;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>The Nakamoto Cipher</h1>
-    <p>Unravel the secrets of Satoshi...</p>
+    <h1>Nakamoto Enigma</h1>
     <div id="challenge">
-      <p>Challenge Level: <span id="challengeLevel">1</span></p>
-      <p>Cipher Type: <span id="cipherType">Caesar Cipher</span></p>
+      <p>Challenge Level: <span id="level"></span></p>
+      <p>Cipher Type: <span id="cipherType"></span></p>
       <p>Encrypted Code: <span id="encrypted"></span></p>
-      <p id="keyHintSection">Key Hint: <span id="keyHint"></span></p>
-      <p>Attempts Left: <span id="attemptsLeft">3</span></p>
-      <input type="text" id="name" placeholder="Enter your name">
-      <input type="text" id="input" placeholder="Enter decoded message">
-      <button onclick="submitChallenge()">Decrypt</button>
-      <p id="result"></p>
+      <p>Key Hint: <span id="keyHint"></span></p>
+      <p>Attempts Left: <span id="attempts"></span></p>
+      <p id="response"></p>
+      <input type="text" id="nameInput" placeholder="Your Name">
+      <input type="text" id="challengeInput" placeholder="Decoded Message">
+      <button onclick="checkChallenge()">Decrypt</button>
     </div>
-    <div id="success" class="hidden">
-      <p class="success">The cipher yields... You are enlightened!</p>
-      <div class="share-buttons">
+    <div id="success">
+      <p id="challengeMessage"></p>
+      <button onclick="toggleShareSelector()">Share Victory</button>
+      <div id="shareSelector" class="share-selector">
         <button onclick="shareSuccess('x')">Share to X</button>
         <button onclick="shareSuccess('facebook')">Share to Facebook</button>
-        <button onclick="shareSuccess('instagram')">Share to Instagram</button>
-        <button onclick="generateImage()">Generate Shareable Image</button>
       </div>
-      <canvas id="successCanvas" width="400" height="200"></canvas>
+      <button onclick="generateImage()">Generate Shareable Image</button>
       <button onclick="nextChallenge()">Next Challenge</button>
     </div>
-    <div id="finalSuccess" class="hidden">
-      <p class="success">You have mastered all Nakamoto Ciphers!</p>
-      <div class="share-buttons">
+    <div id="finalSuccess">
+      <p>You have mastered all Nakamoto Ciphers!</p>
+      <button onclick="toggleShareSelector()">Share Victory</button>
+      <div id="shareSelector" class="share-selector">
         <button onclick="shareSuccess('x')">Share to X</button>
         <button onclick="shareSuccess('facebook')">Share to Facebook</button>
-        <button onclick="shareSuccess('instagram')">Share to Instagram</button>
-        <button onclick="generateImage()">Generate Shareable Image</button>
       </div>
+      <button onclick="generateImage()">Generate Shareable Image</button>
       <button onclick="window.location.href='https://www.paypal.com/donate?hosted_button_id=YOUR_BUTTON_ID'">Donate</button>
-      <div id="chatbox">
-        <h3>Victory Messages</h3>
-        <div id="messages"></div>
-        <input type="text" id="messageInput" placeholder="Leave your victory message">
-        <button onclick="submitMessage()">Post Message</button>
-      </div>
+      <input type="text" id="messageInput" placeholder="Your Victory Message">
+      <button onclick="postMessage()">Post Message</button>
+      <div id="messages"></div>
     </div>
-    <p>User ID: <span id="userId"></span></p>
-    <div id="winners">
-      <h3>Enlightened Souls</h3>
-      <p id="winnerList"></p>
-    </div>
-    <p><a href="https://satoshinai.github.io/satoshiai/leaderboard.html" target="_blank">View Leaderboard</a></p>
-    <p><a href="https://satoshinai.github.io/satoshiai/privacy-policy.html" target="_blank">Privacy Veil</a></p>
   </div>
-
   <script>
-    // Generate UUID for userId
+    let currentLevel = 1;
+    let userId = localStorage.getItem('userId') || generateUUID();
+    localStorage.setItem('userId', userId);
+    let attempts = 3;
+
     function generateUUID() {
-      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
         const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
         return v.toString(16);
       });
     }
 
-    // Get or set userId in localStorage
-    let userId = localStorage.getItem('nakamotoUserId');
-    if (!userId) {
-      userId = generateUUID();
-      localStorage.setItem('nakamotoUserId', userId);
+    function toggleShareSelector() {
+      const selector = document.getElementById('shareSelector');
+      selector.style.display = selector.style.display === 'block' ? 'none' : 'block';
     }
-    let currentLevel = 1;
-    document.getElementById('userId').textContent = userId;
 
-    function loadChallenge(level) {
-      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${encodeURIComponent(userId)}&level=${level}`)
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById('challengeLevel').textContent = data.level;
-          document.getElementById('cipherType').textContent = data.cipherType;
+    async function checkChallenge() {
+      const name = document.getElementById('nameInput').value || 'Anonymous';
+      const input = document.getElementById('challengeInput').value;
+      const params = new URLSearchParams({
+        action: 'checkChallenge',
+        userId,
+        name,
+        input,
+        encrypted: document.getElementById('encrypted').textContent,
+        keyHint: document.getElementById('keyHint').textContent,
+        attempts,
+        level: currentLevel
+      });
+      const response = await fetch(`?${params}`);
+      const data = await response.json();
+      document.getElementById('response').textContent = data.response || data.challengeMessage;
+      document.getElementById('attempts').textContent = data.attemptsLeft;
+      if (data.progress > 0 && data.progress < 3) {
+        document.getElementById('challenge').style.display = 'none';
+        document.getElementById('success').style.display = 'block';
+        document.getElementById('challengeMessage').textContent = data.challengeMessage;
+        currentLevel = data.progress;
+      } else if (data.progress === 3) {
+        document.getElementById('challenge').style.display = 'none';
+        document.getElementById('success').style.display = 'none';
+        document.getElementById('finalSuccess').style.display = 'block';
+        getMessages();
+      }
+      if (data.attemptsLeft < attempts) {
+        attempts = data.attemptsLeft;
+        if (attempts === 0) {
           document.getElementById('encrypted').textContent = data.encrypted;
           document.getElementById('keyHint').textContent = data.keyHint;
-          document.getElementById('attemptsLeft').textContent = data.attemptsLeft;
-          document.getElementById('keyHintSection').style.display = data.keyHint === 'No hint provided' ? 'none' : 'block';
-          currentLevel = data.level;
-          if (data.progress === 3) {
-            document.getElementById('challenge').classList.add('hidden');
-            document.getElementById('success').classList.add('hidden');
-            document.getElementById('finalSuccess').classList.remove('hidden');
-            loadMessages();
-          }
-          updateWinners();
-        })
-        .catch(error => console.error('Error fetching challenge:', error));
-    }
-
-    loadChallenge(1);
-
-    function submitChallenge() {
-      const name = document.getElementById('name').value.trim() || 'Anonymous';
-      const input = document.getElementById('input').value.trim();
-      const encrypted = document.getElementById('encrypted').textContent;
-      const keyHint = document.getElementById('keyHint').textContent;
-      const attempts = document.getElementById('attemptsLeft').textContent;
-      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${encodeURIComponent(userId)}&input=${encodeURIComponent(input)}&encrypted=${encodeURIComponent(encrypted)}&keyHint=${encodeURIComponent(keyHint)}&attempts=${encodeURIComponent(attempts)}&name=${encodeURIComponent(name)}&level=${encodeURIComponent(currentLevel)}`)
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById('result').textContent = data.challengeMessage || data.response;
-          document.getElementById('attemptsLeft').textContent = data.attemptsLeft;
-          if (data.progress === 1 && data.level < 3) {
-            document.getElementById('challenge').classList.add('hidden');
-            document.getElementById('success').classList.remove('hidden');
-            document.getElementById('finalSuccess').classList.add('hidden');
-          } else if (data.progress === 3) {
-            document.getElementById('challenge').classList.add('hidden');
-            document.getElementById('success').classList.add('hidden');
-            document.getElementById('finalSuccess').classList.remove('hidden');
-            loadMessages();
-          } else {
-            document.getElementById('challenge').classList.remove('hidden');
-            document.getElementById('success').classList.add('hidden');
-            document.getElementById('finalSuccess').classList.add('hidden');
-          }
-          if (data.encrypted) document.getElementById('encrypted').textContent = data.encrypted;
-          if (data.keyHint) document.getElementById('keyHint').textContent = data.keyHint;
-          document.getElementById('keyHintSection').style.display = data.keyHint === 'No hint provided' ? 'none' : 'block';
-          updateWinners();
-        })
-        .catch(error => console.error('Error submitting challenge:', error));
-    }
-
-    function nextChallenge() {
-      document.getElementById('challenge').classList.remove('hidden');
-      document.getElementById('success').classList.add('hidden');
-      document.getElementById('finalSuccess').classList.add('hidden');
-      document.getElementById('input').value = '';
-      document.getElementById('result').textContent = '';
-      loadChallenge(currentLevel + 1);
-    }
-
-    function updateWinners() {
-      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=getWinners`)
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById('winnerList').textContent = data.winners.join('\n');
-        })
-        .catch(error => console.error('Error fetching winners:', error));
-    }
-
-    function shareSuccess(platform) {
-      const shareText = `I have unraveled the Nakamoto Cipher at Level ${currentLevel}! UserID: ${userId} - Join the enigma at https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec`;
-      const canvas = document.getElementById('successCanvas');
-      const name = document.getElementById('name').value.trim() || 'Anonymous';
-      const timestamp = new Date().toLocaleString();
-
-      // Generate image for sharing
-      const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#1a1a1a';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#333333';
-      for (let x = 0; x < canvas.width; x += 20) {
-        ctx.fillRect(x, 0, 1, canvas.height);
-      }
-      for (let y = 0; y < canvas.height; y += 20) {
-        ctx.fillRect(0, y, canvas.width, 1);
-      }
-      ctx.strokeStyle = '#ffcc00';
-      ctx.lineWidth = 5;
-      ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
-      ctx.fillStyle = '#ffcc00';
-      ctx.font = 'bold 24px Courier New';
-      ctx.textAlign = 'center';
-      ctx.fillText('Nakamoto Enigma Victory!', 200, 40);
-      ctx.fillStyle = '#00ff00';
-      ctx.font = '20px Courier New';
-      ctx.fillText(`Level ${currentLevel} Conquered`, 200, 80);
-      ctx.fillStyle = '#e0e0e0';
-      ctx.font = '16px Courier New';
-      ctx.fillText(`User: ${name}`, 200, 110);
-      ctx.fillText(`ID: ${userId}`, 200, 140);
-      ctx.fillText(`Time: ${timestamp}`, 200, 170);
-      ctx.fillText('Join at nakamotosatoshi.ai', 200, 190);
-
-      if (platform === 'instagram') {
-        alert('Instagram sharing is not directly supported via web. Copy this text to share or use the generated image: ' + shareText);
-        return;
-      }
-
-      canvas.toBlob(blob => {
-        const file = new File([blob], `nakamoto_enigma_level${currentLevel}.png`, { type: 'image/png' });
-        if (navigator.share && navigator.canShare && navigator.canShare({ files: [file] })) {
-          navigator.share({
-            files: [file],
-            title: 'Nakamoto Enigma Victory',
-            text: shareText
-          }).catch(error => console.error('Error sharing:', error));
-        } else {
-          const dataUrl = canvas.toDataURL('image/png');
-          let shareUrl;
-          if (platform === 'x') {
-            shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
-          } else if (platform === 'facebook') {
-            shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec')}&quote=${encodeURIComponent(shareText)}`;
-          }
-          window.open(shareUrl, '_blank');
-          alert('Please manually attach the downloaded image to your post.');
-          const link = document.createElement('a');
-          link.download = `nakamoto_enigma_level${currentLevel}.png`;
-          link.href = dataUrl;
-          link.click();
+          attempts = 3;
+          document.getElementById('attempts').textContent = attempts;
         }
-      });
+      }
+    }
+
+    async function shareSuccess(platform) {
+      const shareText = `I have unraveled the Nakamoto Cipher at Level ${currentLevel}! UserID: ${userId} - Join the enigma at https://satoshinai.github.io/satoshiai/`;
+      const canvas = document.createElement('canvas');
+      canvas.width = 400;
+      canvas.height = 200;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#0d0d0d';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = '#ffcc00';
+      ctx.lineWidth = 2;
+      for (let i = 0; i < canvas.width; i += 20) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, canvas.height);
+        ctx.stroke();
+      }
+      for (let i = 0; i < canvas.height; i += 20) {
+        ctx.beginPath();
+        ctx.moveTo(0, i);
+        ctx.lineTo(canvas.width, i);
+        ctx.stroke();
+      }
+      ctx.fillStyle = '#ffcc00';
+      ctx.font = '20px Orbitron';
+      ctx.textAlign = 'center';
+      ctx.fillText('Nakamoto Enigma Victory!', canvas.width / 2, 50);
+      ctx.fillText(`Level ${currentLevel} Conquered`, canvas.width / 2, 80);
+      ctx.fillText(`User: ${document.getElementById('nameInput').value || 'Anonymous'}`, canvas.width / 2, 110);
+      ctx.fillText(`ID: ${userId.slice(0, 8)}`, canvas.width / 2, 140);
+      ctx.fillText(`Time: ${new Date().toLocaleString()}`, canvas.width / 2, 170);
+      const imageData = canvas.toDataURL('image/png');
+      if (navigator.share && platform !== 'instagram') {
+        const file = await fetch(imageData).then(res => res.blob()).then(blob => new File([blob], `nakamoto_enigma_level${currentLevel}.png`, { type: 'image/png' }));
+        await navigator.share({
+          text: shareText,
+          files: [file]
+        });
+      } else {
+        const link = document.createElement('a');
+        link.href = imageData;
+        link.download = `nakamoto_enigma_level${currentLevel}.png`;
+        link.click();
+        const url = platform === 'x' ? `https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}` :
+                    platform === 'facebook' ? `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://satoshinai.github.io/satoshiai/')}&quote=${encodeURIComponent(shareText)}` :
+                    'https://www.instagram.com/';
+        window.open(url, '_blank');
+      }
+      toggleShareSelector();
     }
 
     function generateImage() {
-      const canvas = document.getElementById('successCanvas');
+      const shareText = `I have unraveled the Nakamoto Cipher at Level ${currentLevel}! UserID: ${userId} - Join the enigma at https://satoshinai.github.io/satoshiai/`;
+      const canvas = document.createElement('canvas');
+      canvas.width = 400;
+      canvas.height = 200;
       const ctx = canvas.getContext('2d');
-      const name = document.getElementById('name').value.trim() || 'Anonymous';
-      const timestamp = new Date().toLocaleString();
-
-      ctx.fillStyle = '#1a1a1a';
+      ctx.fillStyle = '#0d0d0d';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = '#333333';
-      for (let x = 0; x < canvas.width; x += 20) {
-        ctx.fillRect(x, 0, 1, canvas.height);
-      }
-      for (let y = 0; y < canvas.height; y += 20) {
-        ctx.fillRect(0, y, canvas.width, 1);
-      }
       ctx.strokeStyle = '#ffcc00';
-      ctx.lineWidth = 5;
-      ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+      ctx.lineWidth = 2;
+      for (let i = 0; i < canvas.width; i += 20) {
+        ctx.beginPath();
+        ctx.moveTo(i, 0);
+        ctx.lineTo(i, canvas.height);
+        ctx.stroke();
+      }
+      for (let i = 0; i < canvas.height; i += 20) {
+        ctx.beginPath();
+        ctx.moveTo(0, i);
+        ctx.lineTo(canvas.width, i);
+        ctx.stroke();
+      }
       ctx.fillStyle = '#ffcc00';
-      ctx.font = 'bold 24px Courier New';
+      ctx.font = '20px Orbitron';
       ctx.textAlign = 'center';
-      ctx.fillText('Nakamoto Enigma Victory!', 200, 40);
-      ctx.fillStyle = '#00ff00';
-      ctx.font = '20px Courier New';
-      ctx.fillText(`Level ${currentLevel} Conquered`, 200, 80);
-      ctx.fillStyle = '#e0e0e0';
-      ctx.font = '16px Courier New';
-      ctx.fillText(`User: ${name}`, 200, 110);
-      ctx.fillText(`ID: ${userId}`, 200, 140);
-      ctx.fillText(`Time: ${timestamp}`, 200, 170);
-      ctx.fillText('Join at nakamotosatoshi.ai', 200, 190);
-
+      ctx.fillText('Nakamoto Enigma Victory!', canvas.width / 2, 50);
+      ctx.fillText(`Level ${currentLevel} Conquered`, canvas.width / 2, 80);
+      ctx.fillText(`User: ${document.getElementById('nameInput').value || 'Anonymous'}`, canvas.width / 2, 110);
+      ctx.fillText(`ID: ${userId.slice(0, 8)}`, canvas.width / 2, 140);
+      ctx.fillText(`Time: ${new Date().toLocaleString()}`, canvas.width / 2, 170);
       const link = document.createElement('a');
-      link.download = `nakamoto_enigma_level${currentLevel}.png`;
       link.href = canvas.toDataURL('image/png');
+      link.download = `nakamoto_enigma_level${currentLevel}.png`;
       link.click();
     }
 
-    function submitMessage() {
-      const message = document.getElementById('messageInput').value.trim();
-      const name = document.getElementById('name').value.trim() || 'Anonymous';
+    async function nextChallenge() {
+      document.getElementById('success').style.display = 'none';
+      document.getElementById('challenge').style.display = 'block';
+      const params = new URLSearchParams({
+        action: 'checkChallenge',
+        userId,
+        name: document.getElementById('nameInput').value || 'Anonymous',
+        level: currentLevel + 1
+      });
+      const response = await fetch(`?${params}`);
+      const data = await response.json();
+      currentLevel = data.level;
+      document.getElementById('level').textContent = data.level;
+      document.getElementById('cipherType').textContent = data.cipherType;
+      document.getElementById('encrypted').textContent = data.encrypted;
+      document.getElementById('keyHint').textContent = data.keyHint;
+      document.getElementById('attempts').textContent = data.attemptsLeft;
+      document.getElementById('response').textContent = '';
+      document.getElementById('challengeInput').value = '';
+    }
+
+    async function postMessage() {
+      const message = document.getElementById('messageInput').value;
       if (message) {
-        fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=submitMessage&userId=${encodeURIComponent(userId)}&name=${encodeURIComponent(name)}&message=${encodeURIComponent(message)}`)
-          .then(response => response.json())
-          .then(data => {
-            document.getElementById('messageInput').value = '';
-            loadMessages();
-          })
-          .catch(error => console.error('Error submitting message:', error));
+        const params = new URLSearchParams({
+          action: 'submitMessage',
+          userId,
+          name: document.getElementById('nameInput').value || 'Anonymous',
+          message
+        });
+        await fetch(`?${params}`);
+        document.getElementById('messageInput').value = '';
+        getMessages();
       }
     }
 
-    function loadMessages() {
-      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=getMessages`)
-        .then(response => response.json())
-        .then(data => {
-          const messagesDiv = document.getElementById('messages');
-          messagesDiv.innerHTML = data.messages.map(m => `<p>${m[0]} (${m[1]}): ${m[2]}</p>`).join('');
-        })
-        .catch(error => console.error('Error fetching messages:', error));
+    async function getMessages() {
+      const response = await fetch('?action=getMessages');
+      const data = await response.json();
+      const messages = data.messages || [];
+      const messagesDiv = document.getElementById('messages');
+      messagesDiv.innerHTML = messages.map(msg => `<p>${msg[0]} (${msg[1]}): ${msg[2]} - ${msg[3]}</p>`).join('');
     }
+
+    window.onload = async () => {
+      const params = new URLSearchParams({
+        action: 'checkChallenge',
+        userId,
+        level: 1
+      });
+      const response = await fetch(`?${params}`);
+      const data = await response.json();
+      document.getElementById('level').textContent = data.level;
+      document.getElementById('cipherType').textContent = data.cipherType;
+      document.getElementById('encrypted').textContent = data.encrypted;
+      document.getElementById('keyHint').textContent = data.keyHint;
+      document.getElementById('attempts').textContent = data.attemptsLeft;
+    };
   </script>
 </body>
 </html>
