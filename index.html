@@ -10,105 +10,83 @@
     .container { max-width: 600px; margin: 0 auto; }
     input, button { padding: 10px; margin: 5px; font-size: 1em; }
     #result { margin-top: 20px; font-style: italic; }
+    #winners { margin-top: 20px; }
     .hidden { display: none; }
-    #leaderboard { margin-top: 20px; }
-    .share { margin-top: 10px; }
+    .success { color: #00ff00; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>The Nakamoto Enigma</h1>
+    <h1>The Nakamoto Cipher</h1>
     <p>Unravel the secrets of Satoshi...</p>
     <div id="challenge">
-      <p>Level: <span id="level">1</span></p>
       <p>Encrypted Code: <span id="encrypted"></span></p>
       <p>Key Hint: <span id="keyHint"></span></p>
       <p>Attempts Left: <span id="attemptsLeft">3</span></p>
+      <input type="text" id="name" placeholder="Enter your name">
       <input type="text" id="input" placeholder="Enter decoded message">
-      <input type="text" id="name" placeholder="Your name (optional)" class="hidden">
       <button onclick="submitChallenge()">Decrypt</button>
       <p id="result"></p>
-      <div id="share" class="hidden"><button onclick="shareSuccess()">Share</button></div>
     </div>
-    <div id="leaderboard" class="hidden">
-      <h2>Satoshi Ledger</h2>
-      <ul id="leaderboardList"></ul>
+    <div id="success" class="hidden">
+      <p class="success">The cipher yields... You are enlightened!</p>
+      <button onclick="shareSuccess()">Share Your Triumph</button>
     </div>
     <p>User ID: <span id="userId"></span></p>
+    <div id="winners">
+      <h3>Enlightened Souls</h3>
+      <p id="winnerList"></p>
+    </div>
     <p><a href="https://satoshinai.github.io/satoshiai/privacy-policy.html" target="_blank">Privacy Veil</a></p>
+    <p>Spreadsheet: <a href="https://docs.google.com/spreadsheets/d/1n7YJyb9IaY6qIUXbYQ63ITZoklc22cv4c3OcKhUgj0c" target="_blank">Link</a></p>
+    <p>GitHub: <a href="https://github.com/yourusername/nakamoto-satoshi-project" target="_blank">Link</a></p>
+    <p>Script: <a href="https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec" target="_blank">Link</a></p>
   </div>
 
   <script>
-    const userId = 'user' + Math.floor(Math.random() * 10000);
+    const userId = 'imid5grbup'; // 示例User ID，可動態生成
     document.getElementById('userId').textContent = userId;
 
-    function loadChallenge() {
-      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}&level=${document.getElementById('level').textContent}`)
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById('encrypted').textContent = data.encrypted;
-          document.getElementById('keyHint').textContent = data.keyHint;
-          document.getElementById('attemptsLeft').textContent = data.attemptsLeft;
-          document.getElementById('level').textContent = data.level;
-          document.getElementById('result').textContent = data.response || data.challengeMessage;
-          if (data.level > 3) {
-            document.getElementById('challenge').classList.add('hidden');
-            document.getElementById('leaderboard').classList.remove('hidden');
-            loadLeaderboard();
-          } else if (data.level > 1) {
-            document.getElementById('name').classList.remove('hidden');
-          }
-          if (data.shareUrl) {
-            document.getElementById('share').classList.remove('hidden');
-          }
-        });
-    }
+    fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}`)
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('encrypted').textContent = data.encrypted;
+        document.getElementById('keyHint').textContent = data.keyHint;
+        document.getElementById('attemptsLeft').textContent = data.attemptsLeft;
+        updateWinners();
+      });
 
     function submitChallenge() {
+      const name = document.getElementById('name').value.trim() || 'Anonymous';
       const input = document.getElementById('input').value;
-      const name = document.getElementById('name').value || '';
-      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}&input=${input}&level=${document.getElementById('level').textContent}&name=${name}`)
+      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}&input=${input}&encrypted=${document.getElementById('encrypted').textContent}&keyHint=${document.getElementById('keyHint').textContent}&attempts=${document.getElementById('attemptsLeft').textContent}&name=${encodeURIComponent(name)}`)
         .then(response => response.json())
         .then(data => {
           document.getElementById('result').textContent = data.challengeMessage || data.response;
           document.getElementById('attemptsLeft').textContent = data.attemptsLeft;
-          document.getElementById('level').textContent = data.level;
-          if (data.level > 3) {
+          if (data.progress === 1) {
             document.getElementById('challenge').classList.add('hidden');
-            document.getElementById('leaderboard').classList.remove('hidden');
-            loadLeaderboard();
-          } else if (data.level > 1) {
-            document.getElementById('name').classList.remove('hidden');
+            document.getElementById('success').classList.remove('hidden');
           }
-          if (data.shareUrl) {
-            document.getElementById('share').classList.remove('hidden');
-          }
-          document.getElementById('input').value = '';
+          if (data.encrypted) document.getElementById('encrypted').textContent = data.encrypted;
+          if (data.keyHint) document.getElementById('keyHint').textContent = data.keyHint;
+          updateWinners();
         });
     }
 
-    function loadLeaderboard() {
-      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=getLeaderboard`)
+    function updateWinners() {
+      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=getWinners`)
         .then(response => response.json())
         .then(data => {
-          const list = document.getElementById('leaderboardList');
-          list.innerHTML = '';
-          data.leaderboard.forEach(entry => {
-            const li = document.createElement('li');
-            li.textContent = `${entry.userId}: ${entry.name}`;
-            list.appendChild(li);
-          });
+          document.getElementById('winnerList').textContent = data.winners.join('\n');
         });
     }
 
     function shareSuccess() {
-      const shareUrl = document.getElementById('share').getAttribute('data-share');
-      if (shareUrl) {
-        window.open(shareUrl, '_blank');
-      }
+      const shareText = `I have unraveled the Nakamoto Cipher! UserID: ${userId} - Join the enigma at https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec`;
+      const shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
+      window.open(shareUrl, '_blank');
     }
-
-    loadChallenge();
   </script>
 </body>
 </html>
