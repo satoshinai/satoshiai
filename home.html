@@ -59,6 +59,15 @@
       font-size: 0.9em;
       margin-top: 10px;
     }
+    .neon-link {
+      color: #ffcc00;
+      text-decoration: none;
+      margin: 0 10px;
+      transition: all 0.3s ease;
+    }
+    .neon-link:hover {
+      text-shadow: 0 0 10px #ffcc00;
+    }
   </style>
 </head>
 <body>
@@ -76,6 +85,12 @@
       <input id="nameInput" type="text" placeholder="Enter your name" class="mt-4 p-2 bg-[#1a1a1a] text-[#ffcc00] border-2 border-[#ffcc00] rounded">
       <input id="decodedInput" type="text" placeholder="Enter decoded message" class="mt-4 p-2 bg-[#1a1a1a] text-[#ffcc00] border-2 border-[#ffcc00] rounded">
       <button id="decryptButton" class="neon-button mt-4">Decrypt</button>
+      <footer class="mt-8">
+        <a href="https://satoshinai.github.io/satoshiai/" class="neon-link">Home</a>
+        <a href="https://satoshinai.github.io/satoshiai/privacy-policy.html" class="neon-link">Privacy Policy</a>
+        <a href="https://satoshinai.github.io/satoshiai/leaderboard.html" class="neon-link">Leaderboard</a>
+        <a href="https://satoshinai.github.io/satoshiai/messages.html" class="neon-link">Victory Messages</a>
+      </footer>
     </div>
     <div id="success">
       <h1 class="text-3xl font-bold mb-4 text-shadow-[0_0_10px_#ffcc00]">Success!</h1>
@@ -84,6 +99,12 @@
       <p id="shareMessage">For Instagram, download the image and post it manually!</p>
       <button id="generateImageButton" class="neon-button">Generate Shareable Image</button>
       <button id="nextChallengeButton" class="neon-button">Next Challenge</button>
+      <footer class="mt-8">
+        <a href="https://satoshinai.github.io/satoshiai/" class="neon-link">Home</a>
+        <a href="https://satoshinai.github.io/satoshiai/privacy-policy.html" class="neon-link">Privacy Policy</a>
+        <a href="https://satoshinai.github.io/satoshiai/leaderboard.html" class="neon-link">Leaderboard</a>
+        <a href="https://satoshinai.github.io/satoshiai/messages.html" class="neon-link">Victory Messages</a>
+      </footer>
     </div>
     <div id="finalSuccess">
       <h1 class="text-3xl font-bold mb-4 text-shadow-[0_0_10px_#ffcc00]">Master of the Enigma!</h1>
@@ -95,10 +116,16 @@
       <button onclick="window.location.href='https://www.paypal.com/donate?hosted_button_id=YOUR_BUTTON_ID'" class="neon-button">Donate</button>
       <div class="mt-4">
         <h2 class="text-xl font-bold">Victory Messages</h2>
-        <div id="messages" class="mt-2 text-left"></div>
+        <div id="messages" class="mt-2 text-left max-w-md mx-auto"></div>
         <input id="messageInput" type="text" placeholder="Post your victory message" class="mt-4 p-2 bg-[#1a1a1a] text-[#ffcc00] border-2 border-[#ffcc00] rounded">
         <button id="postMessageButton" class="neon-button mt-4">Post Message</button>
       </div>
+      <footer class="mt-8">
+        <a href="https://satoshinai.github.io/satoshiai/" class="neon-link">Home</a>
+        <a href="https://satoshinai.github.io/satoshiai/privacy-policy.html" class="neon-link">Privacy Policy</a>
+        <a href="https://satoshinai.github.io/satoshiai/leaderboard.html" class="neon-link">Leaderboard</a>
+        <a href="https://satoshinai.github.io/satoshiai/messages.html" class="neon-link">Victory Messages</a>
+      </footer>
     </div>
   </div>
   <script>
