@@ -8,31 +8,50 @@
     body { font-family: 'Courier New', monospace; background: #1a1a1a; color: #e0e0e0; text-align: center; padding: 50px; }
     h1 { font-size: 2.5em; color: #ffcc00; }
     .container { max-width: 600px; margin: 0 auto; }
-    #winnerList { margin-top: 20px; text-align: left; }
-    .back-link { margin-top: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 10px; border: 1px solid #ffcc00; }
+    th { background: #333; }
+    a { color: #ffcc00; text-decoration: none; }
+    a:hover { text-decoration: underline; }
   </style>
 </head>
 <body>
   <div class="container">
     <h1>Nakamoto Enigma Leaderboard</h1>
-    <p>Behold the enlightened who conquered the cipher...</p>
-    <div id="winners">
-      <h3>Enlightened Souls</h3>
-      <p id="winnerList"></p>
-    </div>
-    <p class="back-link"><a href="index.html">Back to Challenge</a></p>
+    <p>The enlightened who have conquered the ciphers...</p>
+    <table id="leaderboard">
+      <thead>
+        <tr>
+          <th>User ID</th>
+          <th>Name</th>
+          <th>Level</th>
+          <th>Timestamp</th>
+        </tr>
+      </thead>
+      <tbody id="leaderboardBody"></tbody>
+    </table>
+    <p><a href="index.html">Return to Challenge</a></p>
+    <p><a href="https://satoshinai.github.io/satoshiai/privacy-policy.html" target="_blank">Privacy Veil</a></p>
   </div>
 
   <script>
-    function updateWinners() {
-      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=getWinners`)
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById('winnerList').textContent = data.winners.join('\n');
-        })
-        .catch(error => console.error('Error fetching winners:', error));
-    }
-    updateWinners();
+    fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=getWinners`)
+      .then(response => response.json())
+      .then(data => {
+        const tbody = document.getElementById('leaderboardBody');
+        data.winners.forEach(winner => {
+          const [userId, name, level, timestamp] = winner.split(' - ');
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${userId}</td>
+            <td>${name}</td>
+            <td>${level}</td>
+            <td>${timestamp.replace('(Sealed: ', '').replace(')', '')}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      })
+      .catch(error => console.error('Error fetching leaderboard:', error));
   </script>
 </body>
 </html>
