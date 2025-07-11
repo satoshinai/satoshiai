@@ -38,25 +38,32 @@
       <p id="winnerList"></p>
     </div>
     <p><a href="https://satoshinai.github.io/satoshiai/privacy-policy.html" target="_blank">Privacy Veil</a></p>
+    <p>Spreadsheet: <a href="https://docs.google.com/spreadsheets/d/1n7YJyb9IaY6qIUXbYQ63ITZoklc22cv4c3OcKhUgj0c" target="_blank">Link</a></p>
+    <p>GitHub: <a href="https://github.com/yourusername/nakamoto-satoshi-project" target="_blank">Link</a></p>
+    <p>Script: <a href="https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec" target="_blank">Link</a></p>
   </div>
 
   <script>
-    const userId = 'imid5grbup'; // 示例User ID，可動態生成
+    const userId = 'imid5grbup';
     document.getElementById('userId').textContent = userId;
 
-    fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}`)
+    fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${encodeURIComponent(userId)}`)
       .then(response => response.json())
       .then(data => {
         document.getElementById('encrypted').textContent = data.encrypted;
         document.getElementById('keyHint').textContent = data.keyHint;
         document.getElementById('attemptsLeft').textContent = data.attemptsLeft;
         updateWinners();
-      });
+      })
+      .catch(error => console.error('Error fetching initial challenge:', error));
 
     function submitChallenge() {
       const name = document.getElementById('name').value.trim() || 'Anonymous';
-      const input = document.getElementById('input').value;
-      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}&input=${input}&encrypted=${document.getElementById('encrypted').textContent}&keyHint=${document.getElementById('keyHint').textContent}&attempts=${document.getElementById('attemptsLeft').textContent}&name=${encodeURIComponent(name)}`)
+      const input = document.getElementById('input').value.trim();
+      const encrypted = document.getElementById('encrypted').textContent;
+      const keyHint = document.getElementById('keyHint').textContent;
+      const attempts = document.getElementById('attemptsLeft').textContent;
+      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${encodeURIComponent(userId)}&input=${encodeURIComponent(input)}&encrypted=${encodeURIComponent(encrypted)}&keyHint=${encodeURIComponent(keyHint)}&attempts=${encodeURIComponent(attempts)}&name=${encodeURIComponent(name)}`)
         .then(response => response.json())
         .then(data => {
           document.getElementById('result').textContent = data.challengeMessage || data.response;
@@ -64,11 +71,15 @@
           if (data.progress === 1) {
             document.getElementById('challenge').classList.add('hidden');
             document.getElementById('success').classList.remove('hidden');
+          } else {
+            document.getElementById('challenge').classList.remove('hidden');
+            document.getElementById('success').classList.add('hidden');
           }
           if (data.encrypted) document.getElementById('encrypted').textContent = data.encrypted;
           if (data.keyHint) document.getElementById('keyHint').textContent = data.keyHint;
           updateWinners();
-        });
+        })
+        .catch(error => console.error('Error submitting challenge:', error));
     }
 
     function updateWinners() {
@@ -76,7 +87,8 @@
         .then(response => response.json())
         .then(data => {
           document.getElementById('winnerList').textContent = data.winners.join('\n');
-        });
+        })
+        .catch(error => console.error('Error fetching winners:', error));
     }
 
     function shareSuccess() {
