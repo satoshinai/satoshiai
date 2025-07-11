@@ -8,7 +8,7 @@
     body { font-family: 'Courier New', monospace; background: #1a1a1a; color: #e0e0e0; text-align: center; padding: 50px; }
     h1 { font-size: 2.5em; color: #ffcc00; }
     .container { max-width: 600px; margin: 0 auto; }
-    input, button, select { padding: 10px; margin: 5px; font-size: 1em; }
+    input, button { padding: 10px; margin: 5px; font-size: 1em; }
     #result { margin-top: 20px; font-style: italic; }
     #winners { margin-top: 20px; }
     .hidden { display: none; }
@@ -21,12 +21,7 @@
     <h1>The Nakamoto Cipher</h1>
     <p>Unravel the secrets of Satoshi...</p>
     <div id="challenge">
-      <p>Challenge Level: <span id="level">1</span></p>
-      <select id="levelSelect" onchange="changeLevel()">
-        <option value="1">Level 1</option>
-        <option value="2">Level 2</option>
-        <option value="3">Level 3</option>
-      </select>
+      <p>Challenge Level: <span id="challengeLevel">1</span></p>
       <p>Encrypted Code: <span id="encrypted"></span></p>
       <p>Key Hint: <span id="keyHint"></span></p>
       <p>Attempts Left: <span id="attemptsLeft">3</span></p>
@@ -38,11 +33,11 @@
     <div id="success" class="hidden">
       <p class="success">The cipher yields... You are enlightened!</p>
       <div class="share-buttons">
-        <button onclick="shareSuccess('twitter')">Share to X</button>
+        <button onclick="shareSuccess('x')">Share to X</button>
         <button onclick="shareSuccess('facebook')">Share to Facebook</button>
         <button onclick="shareSuccess('instagram')">Share to Instagram</button>
       </div>
-      <button onclick="proceedToNextLevel()">Next Level</button>
+      <button onclick="nextChallenge()">Next Challenge</button>
     </div>
     <p>User ID: <span id="userId"></span></p>
     <div id="winners">
@@ -58,21 +53,21 @@
     let currentLevel = 1;
     document.getElementById('userId').textContent = userId;
 
-    function fetchChallenge() {
-      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${encodeURIComponent(userId)}&level=${currentLevel}`)
+    function loadChallenge(level) {
+      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${encodeURIComponent(userId)}&level=${level}`)
         .then(response => response.json())
         .then(data => {
+          document.getElementById('challengeLevel').textContent = data.level;
           document.getElementById('encrypted').textContent = data.encrypted;
           document.getElementById('keyHint').textContent = data.keyHint;
           document.getElementById('attemptsLeft').textContent = data.attemptsLeft;
-          document.getElementById('level').textContent = data.level;
-          document.getElementById('levelSelect').value = data.level;
+          currentLevel = data.level;
           updateWinners();
         })
         .catch(error => console.error('Error fetching challenge:', error));
     }
 
-    fetchChallenge();
+    loadChallenge(1);
 
     function submitChallenge() {
       const name = document.getElementById('name').value.trim() || 'Anonymous';
@@ -80,16 +75,11 @@
       const encrypted = document.getElementById('encrypted').textContent;
       const keyHint = document.getElementById('keyHint').textContent;
       const attempts = document.getElementById('attemptsLeft').textContent;
-      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${encodeURIComponent(userId)}&input=${encodeURIComponent(input)}&encrypted=${encodeURIComponent(encrypted)}&keyHint=${encodeURIComponent(keyHint)}&attempts=${encodeURIComponent(attempts)}&name=${encodeURIComponent(name)}&level=${currentLevel}`)
+      fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${encodeURIComponent(userId)}&input=${encodeURIComponent(input)}&encrypted=${encodeURIComponent(encrypted)}&keyHint=${encodeURIComponent(keyHint)}&attempts=${encodeURIComponent(attempts)}&name=${encodeURIComponent(name)}&level=${encodeURIComponent(currentLevel)}`)
         .then(response => response.json())
         .then(data => {
           document.getElementById('result').textContent = data.challengeMessage || data.response;
           document.getElementById('attemptsLeft').textContent = data.attemptsLeft;
-          document.getElementById('encrypted').textContent = data.encrypted;
-          document.getElementById('keyHint').textContent = data.keyHint;
-          document.getElementById('level').textContent = data.level;
-          document.getElementById('levelSelect').value = data.level;
-          currentLevel = data.level;
           if (data.progress === 1) {
             document.getElementById('challenge').classList.add('hidden');
             document.getElementById('success').classList.remove('hidden');
@@ -97,24 +87,19 @@
             document.getElementById('challenge').classList.remove('hidden');
             document.getElementById('success').classList.add('hidden');
           }
+          if (data.encrypted) document.getElementById('encrypted').textContent = data.encrypted;
+          if (data.keyHint) document.getElementById('keyHint').textContent = data.keyHint;
           updateWinners();
         })
         .catch(error => console.error('Error submitting challenge:', error));
     }
 
-    function changeLevel() {
-      currentLevel = parseInt(document.getElementById('levelSelect').value);
-      fetchChallenge();
-    }
-
-    function proceedToNextLevel() {
-      if (currentLevel < 3) {
-        currentLevel++;
-        document.getElementById('levelSelect').value = currentLevel;
-        document.getElementById('challenge').classList.remove('hidden');
-        document.getElementById('success').classList.add('hidden');
-        fetchChallenge();
-      }
+    function nextChallenge() {
+      document.getElementById('challenge').classList.remove('hidden');
+      document.getElementById('success').classList.add('hidden');
+      document.getElementById('input').value = '';
+      document.getElementById('result').textContent = '';
+      loadChallenge(currentLevel + 1);
     }
 
     function updateWinners() {
@@ -129,12 +114,13 @@
     function shareSuccess(platform) {
       const shareText = `I have unraveled the Nakamoto Cipher at Level ${currentLevel}! UserID: ${userId} - Join the enigma at https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec`;
       let shareUrl;
-      if (platform === 'twitter') {
+      if (platform === 'x') {
         shareUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}`;
       } else if (platform === 'facebook') {
         shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec')}&quote=${encodeURIComponent(shareText)}`;
       } else if (platform === 'instagram') {
-        shareUrl = `https://www.instagram.com/?url=${encodeURIComponent('https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec')}`; // Note: Instagram sharing is limited; directs to app
+        alert('Instagram sharing is not directly supported via web. Copy this text to share: ' + shareText);
+        return;
       }
       window.open(shareUrl, '_blank');
     }
