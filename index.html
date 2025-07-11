@@ -14,6 +14,7 @@
     .hidden { display: none; }
     .success { color: #00ff00; }
     .share-buttons { display: flex; justify-content: center; gap: 10px; }
+    canvas { display: none; }
   </style>
 </head>
 <body>
@@ -22,8 +23,9 @@
     <p>Unravel the secrets of Satoshi...</p>
     <div id="challenge">
       <p>Challenge Level: <span id="challengeLevel">1</span></p>
+      <p>Cipher Type: <span id="cipherType">Caesar Cipher</span></p>
       <p>Encrypted Code: <span id="encrypted"></span></p>
-      <p>Key Hint: <span id="keyHint"></span></p>
+      <p id="keyHintSection">Key Hint: <span id="keyHint"></span></p>
       <p>Attempts Left: <span id="attemptsLeft">3</span></p>
       <input type="text" id="name" placeholder="Enter your name">
       <input type="text" id="input" placeholder="Enter decoded message">
@@ -36,7 +38,9 @@
         <button onclick="shareSuccess('x')">Share to X</button>
         <button onclick="shareSuccess('facebook')">Share to Facebook</button>
         <button onclick="shareSuccess('instagram')">Share to Instagram</button>
+        <button onclick="generateImage()">Generate Shareable Image</button>
       </div>
+      <canvas id="successCanvas" width="400" height="200"></canvas>
       <button onclick="nextChallenge()">Next Challenge</button>
     </div>
     <p>User ID: <span id="userId"></span></p>
@@ -44,12 +48,25 @@
       <h3>Enlightened Souls</h3>
       <p id="winnerList"></p>
     </div>
-    <p><a href="leaderboard.html" target="_blank">View Leaderboard</a></p>
+    <p><a href="https://satoshinai.github.io/satoshiai/leaderboard.html" target="_blank">View Leaderboard</a></p>
     <p><a href="https://satoshinai.github.io/satoshiai/privacy-policy.html" target="_blank">Privacy Veil</a></p>
   </div>
 
   <script>
-    const userId = 'imid5grbup';
+    // Generate UUID for userId
+    function generateUUID() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+        return v.toString(16);
+      });
+    }
+
+    // Get or set userId in localStorage
+    let userId = localStorage.getItem('nakamotoUserId');
+    if (!userId) {
+      userId = generateUUID();
+      localStorage.setItem('nakamotoUserId', userId);
+    }
     let currentLevel = 1;
     document.getElementById('userId').textContent = userId;
 
@@ -58,9 +75,11 @@
         .then(response => response.json())
         .then(data => {
           document.getElementById('challengeLevel').textContent = data.level;
+          document.getElementById('cipherType').textContent = data.cipherType;
           document.getElementById('encrypted').textContent = data.encrypted;
           document.getElementById('keyHint').textContent = data.keyHint;
           document.getElementById('attemptsLeft').textContent = data.attemptsLeft;
+          document.getElementById('keyHintSection').style.display = data.keyHint === 'No hint provided' ? 'none' : 'block';
           currentLevel = data.level;
           updateWinners();
         })
@@ -89,6 +108,7 @@
           }
           if (data.encrypted) document.getElementById('encrypted').textContent = data.encrypted;
           if (data.keyHint) document.getElementById('keyHint').textContent = data.keyHint;
+          document.getElementById('keyHintSection').style.display = data.keyHint === 'No hint provided' ? 'none' : 'block';
           updateWinners();
         })
         .catch(error => console.error('Error submitting challenge:', error));
@@ -119,10 +139,47 @@
       } else if (platform === 'facebook') {
         shareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent('https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec')}&quote=${encodeURIComponent(shareText)}`;
       } else if (platform === 'instagram') {
-        alert('Instagram sharing is not directly supported via web. Copy this text to share: ' + shareText);
+        alert('Instagram sharing is not directly supported via web. Copy this text to share or use the generated image: ' + shareText);
         return;
       }
       window.open(shareUrl, '_blank');
+    }
+
+    function generateImage() {
+      const canvas = document.getElementById('successCanvas');
+      const ctx = canvas.getContext('2d');
+      const name = document.getElementById('name').value.trim() || 'Anonymous';
+      const timestamp = new Date().toLocaleString();
+
+      // Clear canvas
+      ctx.fillStyle = '#1a1a1a';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Draw border
+      ctx.strokeStyle = '#ffcc00';
+      ctx.lineWidth = 5;
+      ctx.strokeRect(10, 10, canvas.width - 20, canvas.height - 20);
+
+      // Draw text
+      ctx.fillStyle = '#ffcc00';
+      ctx.font = 'bold 24px Courier New';
+      ctx.textAlign = 'center';
+      ctx.fillText('Nakamoto Enigma Victory!', 200, 40);
+      ctx.fillStyle = '#00ff00';
+      ctx.font = '20px Courier New';
+      ctx.fillText(`Level ${currentLevel} Conquered`, 200, 80);
+      ctx.fillStyle = '#e0e0e0';
+      ctx.font = '16px Courier New';
+      ctx.fillText(`User: ${name}`, 200, 110);
+      ctx.fillText(`ID: ${userId}`, 200, 140);
+      ctx.fillText(`Time: ${timestamp}`, 200, 170);
+      ctx.fillText('Join at nakamotosatoshi.ai', 200, 190);
+
+      // Create download link
+      const link = document.createElement('a');
+      link.download = `nakamoto_enigma_level${currentLevel}.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
     }
   </script>
 </body>
