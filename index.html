@@ -16,41 +16,34 @@
       font-family: 'Orbitron', monospace;
       overflow: hidden;
     }
+
     .container {
       position: relative;
       z-index: 1;
+      text-align: center;
     }
+
     .title {
       color: #ffcc00;
       font-size: 2.5em;
-      text-align: center;
       text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00, 0 0 30px #ffcc00;
       animation: flicker 3s infinite alternate;
       letter-spacing: 2px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
     }
+
+    .title:hover {
+      color: #ffffff;
+      text-shadow: 0 0 10px #ffffff, 0 0 20px #ffffff, 0 0 30px #ffffff;
+    }
+
     @keyframes flicker {
       0%, 10%, 20%, 30%, 60%, 70%, 100% { opacity: 1; text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00; }
       15%, 25%, 65% { opacity: 0.7; text-shadow: 0 0 5px #ffcc00; }
     }
-    button {
-      margin-top: 30px;
-      padding: 12px 24px;
-      font-size: 1.2em;
-      background: transparent;
-      color: #ffcc00;
-      border: 2px solid #ffcc00;
-      border-radius: 5px;
-      cursor: pointer;
-      font-family: 'Orbitron', monospace;
-      transition: all 0.3s ease;
-      box-shadow: 0 0 10px #ffcc00;
-    }
-    button:hover {
-      background: #ffcc00;
-      color: #0d0d0d;
-      box-shadow: 0 0 20px #ffcc00;
-    }
-    /* Glitch background */
+
     canvas {
       position: fixed;
       top: 0;
@@ -60,12 +53,13 @@
       z-index: 0;
       opacity: 0.2;
     }
-    /* Responsive font size */
+
     @media (max-width: 600px) {
       .title {
         font-size: 1.8em;
       }
     }
+
     @media (max-width: 400px) {
       .title {
         font-size: 1.4em;
@@ -77,9 +71,9 @@
 <body>
   <canvas id="glitchCanvas"></canvas>
   <div class="container">
-    <h1 class="title">nakamotosatoshi.ai</h1>
-    <button onclick="window.location.href='https://satoshinai.github.io/satoshiai/home.html'">Begin the Enigma</button>
+    <a href="https://satoshinai.github.io/satoshiai/home.html" class="title">nakamotosatoshi.ai</a>
   </div>
+
   <script>
     // Glitch background animation
     const canvas = document.getElementById('glitchCanvas');
@@ -107,6 +101,7 @@
     }
 
     animate();
+
     window.addEventListener('resize', () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
