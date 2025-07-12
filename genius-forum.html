@@ -74,6 +74,29 @@
       font-size: 0.9em;
       margin-top: 10px;
     }
+    #postInput {
+      width: 100%;
+      max-width: 500px;
+      background: #1a1a1a;
+      border: 2px solid #ffcc00;
+      color: #ffcc00;
+      padding: 8px;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+    #posts {
+      max-height: 400px;
+      overflow-y: auto;
+      padding: 10px;
+      border: 1px solid #ffcc00;
+      border-radius: 5px;
+      background: #1a1a1a;
+    }
+    .post {
+      margin-bottom: 10px;
+      padding: 10px;
+      border-bottom: 1px solid #ffcc00;
+    }
   </style>
 </head>
 <body>
@@ -91,9 +114,10 @@
     <div id="forum">
       <h1 class="text-3xl font-bold mb-4 text-shadow-[0_0_10px_#ffcc00]">Welcome to the Genius Forum</h1>
       <p class="mb-4">You have entered the inner sanctum. Share your wisdom with fellow cipher masters!</p>
-      <div id="posts" class="mb-4">
-        <p>Placeholder: Community posts coming soon...</p>
-      </div>
+      <input id="postInput" type="text" placeholder="Share your thoughts (max 280 chars)" maxlength="280" class="mt-4">
+      <button id="postButton" class="neon-button">Post</button>
+      <p class="mb-4 text-sm">Valid forum code required to post.</p>
+      <div id="posts" class="mb-4"></div>
     </div>
     <footer class="mt-8">
       <a href="https://nakamotosatoshi.ai" class="neon-link">Home</a>
@@ -104,10 +128,12 @@
     </footer>
   </div>
   <script>
+    let currentCode = '';
+
     function checkCode() {
       const code = document.getElementById('codeInput').value.trim();
       const responseEl = document.getElementById('loginResponse');
-      const loadingEl = document.getElementById('loginResponse');
+      const loadingEl = document.getElementById('loading');
       if (!code) {
         responseEl.textContent = 'Enter a code to proceed.';
         return;
@@ -119,9 +145,11 @@
         .then(data => {
           loadingEl.style.display = 'none';
           if (data.success) {
+            currentCode = code;
             document.getElementById('login').style.display = 'none';
             document.getElementById('forum').style.display = 'block';
             responseEl.textContent = '';
+            fetchPosts();
           } else {
             responseEl.textContent = data.error || 'Invalid code. Fuel the Network to receive one.';
           }
@@ -133,9 +161,66 @@
         });
     }
 
+    function fetchPosts() {
+      fetch(`https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=getPosts`)
+        .then(response => response.json())
+        .then(data => {
+          const postsDiv = document.getElementById('posts');
+          postsDiv.innerHTML = '';
+          if (data.posts && data.posts.length > 0) {
+            data.posts.forEach(([name, userId, post, timestamp]) => {
+              const p = document.createElement('div');
+              p.className = 'post';
+              p.textContent = `${name} (${userId}): ${post} - ${timestamp}`;
+              postsDiv.appendChild(p);
+            });
+          } else {
+            postsDiv.innerHTML = '<p>No posts yet. Be the first to share!</p>';
+          }
+        })
+        .catch(err => {
+          console.error('Fetch posts error:', err);
+          document.getElementById('posts').innerHTML = '<p>Error loading posts.</p>';
+        });
+    }
+
+    function submitPost() {
+      const post = document.getElementById('postInput').value.trim();
+      if (!post) {
+        alert('Please enter a post.');
+        return;
+      }
+      if (!currentCode) {
+        alert('Invalid or missing code. Please re-enter your code.');
+        document.getElementById('login').style.display = 'block';
+        document.getElementById('forum').style.display = 'none';
+        return;
+      }
+      const name = 'Anonymous'; // Can be extended to allow user input
+      const userId = Math.random().toString(36).substring(2, 15); // Generate for anonymity
+      fetch(`https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=submitPost&code=${encodeURIComponent(currentCode)}&name=${encodeURIComponent(name)}&userId=${userId}&post=${encodeURIComponent(post)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            document.getElementById('postInput').value = '';
+            fetchPosts();
+          } else {
+            alert(data.error || 'Failed to post. Ensure your code is valid.');
+          }
+        })
+        .catch(err => {
+          console.error('Post error:', err);
+          alert('Error posting message.');
+        });
+    }
+
     document.getElementById('loginButton').addEventListener('click', checkCode);
     document.getElementById('codeInput').addEventListener('keypress', (e) => {
       if (e.key === 'Enter') checkCode();
+    });
+    document.getElementById('postButton').addEventListener('click', submitPost);
+    document.getElementById('postInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') submitPost();
     });
 
     const canvas = document.getElementById('glitchCanvas');
