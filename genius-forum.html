@@ -65,6 +65,15 @@
       max-width: 600px;
       margin: 0 auto;
     }
+    #loginResponse {
+      color: #ff4444;
+    }
+    #loading {
+      display: none;
+      color: #ffcc00;
+      font-size: 0.9em;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
@@ -73,10 +82,11 @@
     <div id="login">
       <h1 class="text-3xl font-bold mb-4 text-shadow-[0_0_10px_#ffcc00]">Genius Forum</h1>
       <p class="mb-4">Enter the void with your sacred code...</p>
-      <input id="codeInput" type="text" placeholder="Enter your code" class="mt-4 p-2 bg-[#1a1a1a] text-[#ffcc00] border-2 border-[#ffcc00] rounded">
+      <input id="codeInput" type="text" placeholder="Enter code (case-sensitive)" class="mt-4 p-2 bg-[#1a1a1a] text-[#ffcc00] border-2 border-[#ffcc00] rounded">
       <button id="loginButton" class="neon-button mt-4">Unlock the Forum</button>
+      <p id="loading">Validating...</p>
       <p id="loginResponse" class="mt-4"></p>
-      <p class="mb-4">Fuel the Network to receive a code: <a href="https://nowpayments.io/payment?iid=5299822104" class="neon-link">Contribute</a></p>
+      <p class="mt-4">Fuel the Network to receive a code: <a href="https://nowpayments.io/payment?iid=5299822104" class="neon-link">Contribute</a></p>
     </div>
     <div id="forum">
       <h1 class="text-3xl font-bold mb-4 text-shadow-[0_0_10px_#ffcc00]">Welcome to the Genius Forum</h1>
@@ -95,25 +105,38 @@
   </div>
   <script>
     function checkCode() {
-      const code = document.getElementById('codeInput').value;
+      const code = document.getElementById('codeInput').value.trim();
+      const responseEl = document.getElementById('loginResponse');
+      const loadingEl = document.getElementById('loginResponse');
       if (!code) {
-        document.getElementById('loginResponse').textContent = 'Enter a code to proceed.';
+        responseEl.textContent = 'Enter a code to proceed.';
         return;
       }
+      responseEl.textContent = '';
+      loadingEl.style.display = 'block';
       fetch(`https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkCode&code=${encodeURIComponent(code)}`)
         .then(response => response.json())
         .then(data => {
+          loadingEl.style.display = 'none';
           if (data.success) {
             document.getElementById('login').style.display = 'none';
             document.getElementById('forum').style.display = 'block';
-            document.getElementById('loginResponse').textContent = '';
+            responseEl.textContent = '';
           } else {
-            document.getElementById('loginResponse').textContent = data.error || 'Invalid code. Fuel the Network to receive one.';
+            responseEl.textContent = data.error || 'Invalid code. Fuel the Network to receive one.';
           }
+        })
+        .catch(err => {
+          loadingEl.style.display = 'none';
+          responseEl.textContent = 'Error validating code. Try again.';
+          console.error('Fetch error:', err);
         });
     }
 
     document.getElementById('loginButton').addEventListener('click', checkCode);
+    document.getElementById('codeInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') checkCode();
+    });
 
     const canvas = document.getElementById('glitchCanvas');
     const ctx = canvas.getContext('2d');
