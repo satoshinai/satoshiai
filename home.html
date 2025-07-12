@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nakamoto Enigma</title>
+  <title>Nakamoto Enigma - Challenge</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
@@ -34,6 +34,9 @@
       text-align: center;
       padding: 20px;
     }
+    #challenge, #success, #finalSuccess {
+      display: none;
+    }
     .neon-button {
       background: transparent;
       border: 2px solid #ffcc00;
@@ -50,6 +53,12 @@
       color: #0d0d0d;
       box-shadow: 0 0 20px #ffcc00;
     }
+    #shareMessage {
+      display: none;
+      color: #ffcc00;
+      font-size: 0.9em;
+      margin-top: 10px;
+    }
     .neon-link {
       color: #ffcc00;
       text-decoration: none;
@@ -64,18 +73,235 @@
 <body>
   <canvas id="glitchCanvas"></canvas>
   <div class="container">
-    <h1 class="text-4xl font-bold mb-4 text-shadow-[0_0_10px_#ffcc00]">Nakamoto Enigma</h1>
-    <p class="mb-4">Unravel the mystery of the blockchain...</p>
-    <button onclick="window.location.href='https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec'" class="neon-button">Begin the Enigma</button>
-    <footer class="mt-8">
-      <a href="https://nakamotosatoshi.ai" class="neon-link">Home</a>
-      <a href="https://nakamotosatoshi.ai/privacy-policy.html" class="neon-link">Privacy Policy</a>
-      <a href="https://nakamotosatoshi.ai/leaderboard.html" class="neon-link">Leaderboard</a>
-      <a href="https://nakamotosatoshi.ai/messages.html" class="neon-link">Victory Messages</a>
-      <a href="https://nakamotosatoshi.ai/genius-forum.html" class="neon-link">Genius Forum</a>
-    </footer>
+    <div id="challenge">
+      <h1 class="text-3xl font-bold mb-4 text-shadow-[0_0_10px_#ffcc00]">Nakamoto Enigma</h1>
+      <p id="challengeLevel">Challenge Level: <span id="level">1</span></p>
+      <p id="cipherType">Cipher Type: <span id="type">Caesar Cipher</span></p>
+      <p id="encryptedCode">Encrypted Code: <span id="code"></span></p>
+      <p id="keyHint">Key Hint: <span id="hint"></span></p>
+      <p id="attemptsLeft">Attempts Left: <span id="attempts">3</span></p>
+      <p id="response" class="mt-4"></p>
+      <p id="challengeMessage" class="mt-4"></p>
+      <input id="nameInput" type="text" placeholder="Enter your name" class="mt-4 p-2 bg-[#1a1a1a] text-[#ffcc00] border-2 border-[#ffcc00] rounded">
+      <input id="decodedInput" type="text" placeholder="Enter decoded message" class="mt-4 p-2 bg-[#1a1a1a] text-[#ffcc00] border-2 border-[#ffcc00] rounded">
+      <button id="decryptButton" class="neon-button mt-4">Decrypt</button>
+      <footer class="mt-8">
+        <a href="https://nakamotosatoshi.ai" class="neon-link">Home</a>
+        <a href="https://nakamotosatoshi.ai/privacy-policy.html" class="neon-link">Privacy Policy</a>
+        <a href="https://nakamotosatoshi.ai/leaderboard.html" class="neon-link">Leaderboard</a>
+        <a href="https://nakamotosatoshi.ai/messages.html" class="neon-link">Victory Messages</a>
+        <a href="https://nakamotosatoshi.ai/genius-forum.html" class="neon-link">Genius Forum</a>
+      </footer>
+    </div>
+    <div id="success">
+      <h1 class="text-3xl font-bold mb-4 text-shadow-[0_0_10px_#ffcc00]">Success!</h1>
+      <p id="successMessage" class="mb-4"></p>
+      <button id="shareButton" class="neon-button">Share Victory</button>
+      <p id="shareMessage">Share on your favorite platform!</p>
+      <button id="generateImageButton" class="neon-button">Generate Shareable Image</button>
+      <button id="nextChallengeButton" class="neon-button">Next Challenge</button>
+      <footer class="mt-8">
+        <a href="https://nakamotosatoshi.ai" class="neon-link">Home</a>
+        <a href="https://nakamotosatoshi.ai/privacy-policy.html" class="neon-link">Privacy Policy</a>
+        <a href="https://nakamotosatoshi.ai/leaderboard.html" class="neon-link">Leaderboard</a>
+        <a href="https://nakamotosatoshi.ai/messages.html" class="neon-link">Victory Messages</a>
+        <a href="https://nakamotosatoshi.ai/genius-forum.html" class="neon-link">Genius Forum</a>
+      </footer>
+    </div>
+    <div id="finalSuccess">
+      <h1 class="text-3xl font-bold mb-4 text-shadow-[0_0_10px_#ffcc00]">Master of the Enigma!</h1>
+      <p class="mb-4">You have mastered all Nakamoto Ciphers!</p>
+      <p class="mb-4">Join thousands of solvers! Share your triumph!</p>
+      <button id="finalShareButton" class="neon-button">Share Victory</button>
+      <p id="shareMessage">Share on your favorite platform!</p>
+      <button id="finalGenerateImageButton" class="neon-button">Generate Shareable Image</button>
+      <button onclick="window.location.href='https://nowpayments.io/payment?iid=5299822104'" class="neon-button">Fuel the Network</button>
+      <div class="mt-4">
+        <h2 class="text-xl font-bold">Victory Messages</h2>
+        <div id="messages" class="mt-2 text-left max-w-md mx-auto"></div>
+        <input id="messageInput" type="text" placeholder="Max 10 chars" maxlength="10" class="mt-4 p-2 bg-[#1a1a1a] text-[#ffcc00] border-2 border-[#ffcc00] rounded">
+        <button id="postMessageButton" class="neon-button mt-4">Post Message</button>
+      </div>
+      <footer class="mt-8">
+        <a href="https://nakamotosatoshi.ai" class="neon-link">Home</a>
+        <a href="https://nakamotosatoshi.ai/privacy-policy.html" class="neon-link">Privacy Policy</a>
+        <a href="https://nakamotosatoshi.ai/leaderboard.html" class="neon-link">Leaderboard</a>
+        <a href="https://nakamotosatoshi.ai/messages.html" class="neon-link">Victory Messages</a>
+        <a href="https://nakamotosatoshi.ai/genius-forum.html" class="neon-link">Genius Forum</a>
+      </footer>
+    </div>
   </div>
   <script>
+    const userId = Math.random().toString(36).substring(2, 15);
+    let currentLevel = 1;
+    let encryptedMessage = '';
+    let keyHint = '';
+    let attemptsLeft = 3;
+    let cipherType = '';
+
+    function fetchChallenge() {
+      const name = document.getElementById('nameInput').value || 'Anonymous';
+      fetch(`https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}&name=${encodeURIComponent(name)}&level=${currentLevel}`)
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('level').textContent = data.level;
+          document.getElementById('type').textContent = data.cipherType;
+          document.getElementById('code').textContent = data.encrypted;
+          document.getElementById('hint').textContent = data.keyHint;
+          document.getElementById('attempts').textContent = data.attemptsLeft;
+          document.getElementById('response').textContent = data.response || '';
+          document.getElementById('challengeMessage').textContent = data.challengeMessage || '';
+          encryptedMessage = data.encrypted;
+          keyHint = data.keyHint;
+          attemptsLeft = data.attemptsLeft;
+          cipherType = data.cipherType;
+          if (data.progress >= 1) {
+            document.getElementById('challenge').style.display = 'none';
+            document.getElementById('success').style.display = 'block';
+            document.getElementById('successMessage').textContent = data.challengeMessage;
+            document.getElementById('shareMessage').style.display = 'block';
+            if (data.progress === 3) {
+              document.getElementById('success').style.display = 'none';
+              document.getElementById('finalSuccess').style.display = 'block';
+              fetchMessages();
+            }
+          } else {
+            document.getElementById('challenge').style.display = 'block';
+            document.getElementById('success').style.display = 'none';
+            document.getElementById('finalSuccess').style.display = 'none';
+          }
+        });
+    }
+
+    function checkChallenge() {
+      const input = document.getElementById('decodedInput').value;
+      const name = document.getElementById('nameInput').value || 'Anonymous';
+      fetch(`https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}&input=${encodeURIComponent(input)}&encrypted=${encodeURIComponent(encryptedMessage)}&keyHint=${encodeURIComponent(keyHint)}&attempts=${attemptsLeft}&name=${encodeURIComponent(name)}&level=${currentLevel}`)
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('response').textContent = data.response || '';
+          document.getElementById('challengeMessage').textContent = data.challengeMessage || '';
+          document.getElementById('level').textContent = data.level;
+          document.getElementById('type').textContent = data.cipherType;
+          document.getElementById('code').textContent = data.encrypted;
+          document.getElementById('hint').textContent = data.keyHint;
+          document.getElementById('attempts').textContent = data.attemptsLeft;
+          encryptedMessage = data.encrypted;
+          keyHint = data.keyHint;
+          attemptsLeft = data.attemptsLeft;
+          cipherType = data.cipherType;
+          if (data.progress >= 1) {
+            document.getElementById('challenge').style.display = 'none';
+            document.getElementById('success').style.display = 'block';
+            document.getElementById('successMessage').textContent = data.challengeMessage;
+            document.getElementById('shareMessage').style.display = 'block';
+            if (data.progress === 3) {
+              document.getElementById('success').style.display = 'none';
+              document.getElementById('finalSuccess').style.display = 'block';
+              fetchMessages();
+            }
+          }
+        });
+    }
+
+    function generateImage() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 400;
+      canvas.height = 200;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#0d0d0d';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#ffcc00';
+      ctx.font = '16px Orbitron';
+      ctx.textAlign = 'center';
+      ctx.fillText('Nakamoto Enigma Victory!', canvas.width / 2, 30);
+      ctx.fillText(`Level ${currentLevel} Conquered`, canvas.width / 2, 60);
+      ctx.fillText(`User: ${document.getElementById('nameInput').value || 'Anonymous'}`, canvas.width / 2, 90);
+      ctx.fillText(`ID: ${userId}`, canvas.width / 2, 120);
+      ctx.fillText(`Time: ${new Date().toLocaleString()}`, canvas.width / 2, 150);
+      ctx.fillText('Join at https://nakamotosatoshi.ai', canvas.width / 2, 180);
+      return canvas.toDataURL('image/png');
+    }
+
+    function shareSuccess() {
+      const name = document.getElementById('nameInput').value || 'Anonymous';
+      const shareText = `I have unraveled the Nakamoto Cipher at Level ${currentLevel}! UserID: ${userId} - Join the enigma at https://nakamotosatoshi.ai`;
+      const imageData = generateImage();
+      if (navigator.share && navigator.canShare && navigator.canShare({ files: [] })) {
+        fetch(imageData)
+          .then(res => res.blob())
+          .then(blob => {
+            const file = new File([blob], `nakamoto_enigma_level${currentLevel}.png`, { type: 'image/png' });
+            navigator.share({
+              text: shareText,
+              files: [file]
+            }).catch(err => console.error('Share failed:', err));
+          });
+      } else {
+        const link = document.createElement('a');
+        link.href = imageData;
+        link.download = `nakamoto_enigma_level${currentLevel}.png`;
+        link.click();
+        alert('Image downloaded! Share on your favorite platform!');
+      }
+    }
+
+    function fetchMessages() {
+      fetch(`https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=getMessages`)
+        .then(response => response.json())
+        .then(data => {
+          const messagesDiv = document.getElementById('messages');
+          messagesDiv.innerHTML = '';
+          data.messages.forEach(([name, userId, message, timestamp]) => {
+            const p = document.createElement('p');
+            p.textContent = `${name} (${userId}): ${message} - ${timestamp}`;
+            messagesDiv.appendChild(p);
+          });
+        });
+    }
+
+    function postMessage() {
+      const message = document.getElementById('messageInput').value;
+      const name = document.getElementById('nameInput').value || 'Anonymous';
+      if (message && message.length <= 10) {
+        fetch(`https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=submitMessage&userId=${userId}&name=${encodeURIComponent(name)}&message=${encodeURIComponent(message)}`)
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              document.getElementById('messageInput').value = '';
+              fetchMessages();
+            } else {
+              alert(data.error || 'Message posting failed.');
+            }
+          });
+      } else {
+        alert('Message must be 10 characters or less.');
+      }
+    }
+
+    document.getElementById('decryptButton').addEventListener('click', checkChallenge);
+    document.getElementById('nextChallengeButton').addEventListener('click', () => {
+      currentLevel++;
+      document.getElementById('challenge').style.display = 'block';
+      document.getElementById('success').style.display = 'none';
+      fetchChallenge();
+    });
+    document.getElementById('shareButton').addEventListener('click', shareSuccess);
+    document.getElementById('finalShareButton').addEventListener('click', shareSuccess);
+    document.getElementById('generateImageButton').addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.href = generateImage();
+      link.download = `nakamoto_enigma_level${currentLevel}.png`;
+      link.click();
+    });
+    document.getElementById('finalGenerateImageButton').addEventListener('click', () => {
+      const link = document.createElement('a');
+      link.href = generateImage();
+      link.download = `nakamoto_enigma_level${currentLevel}.png`;
+      link.click();
+    });
+    document.getElementById('postMessageButton').addEventListener('click', postMessage);
+
     const canvas = document.getElementById('glitchCanvas');
     const ctx = canvas.getContext('2d');
     canvas.width = window.innerWidth;
@@ -102,6 +328,8 @@
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     });
+
+    fetchChallenge();
   </script>
 </body>
 </html>
