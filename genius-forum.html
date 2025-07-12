@@ -129,6 +129,7 @@
   </div>
   <script>
     let currentCode = '';
+    let currentName = '';
 
     function checkCode() {
       const code = document.getElementById('codeInput').value.trim();
@@ -146,6 +147,8 @@
           loadingEl.style.display = 'none';
           if (data.success) {
             currentCode = code;
+            currentName = data.name;
+            document.getElementByIdソーシャルメディア
             document.getElementById('login').style.display = 'none';
             document.getElementById('forum').style.display = 'block';
             responseEl.textContent = '';
@@ -168,10 +171,10 @@
           const postsDiv = document.getElementById('posts');
           postsDiv.innerHTML = '';
           if (data.posts && data.posts.length > 0) {
-            data.posts.forEach(([name, userId, post, timestamp]) => {
+            data.posts.forEach(([name, post, timestamp]) => {
               const p = document.createElement('div');
               p.className = 'post';
-              p.textContent = `${name} (${userId}): ${post} - ${timestamp}`;
+              p.textContent = `${name}: ${post} - ${timestamp}`;
               postsDiv.appendChild(p);
             });
           } else {
@@ -196,9 +199,7 @@
         document.getElementById('forum').style.display = 'none';
         return;
       }
-      const name = 'Anonymous'; // Can be extended to allow user input
-      const userId = Math.random().toString(36).substring(2, 15); // Generate for anonymity
-      fetch(`https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=submitPost&code=${encodeURIComponent(currentCode)}&name=${encodeURIComponent(name)}&userId=${userId}&post=${encodeURIComponent(post)}`)
+      fetch(`https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=submitPost&code=${encodeURIComponent(currentCode)}&name=${encodeURIComponent(currentName)}&post=${encodeURIComponent(post)}`)
         .then(response => response.json())
         .then(data => {
           if (data.success) {
