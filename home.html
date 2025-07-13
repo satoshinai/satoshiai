@@ -4,11 +4,11 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nakamoto Enigma - Challenge</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" fetchpriority="low">
   <script src="https://cdn.tailwindcss.com" defer></script>
   <style>
     body {
-      font-family: 'Orbitron', monospace;
+      font-family: 'Orbitron', monospace, sans-serif;
       background: #0d0d0d;
       color: #ffcc00;
       margin: 0;
@@ -26,6 +26,7 @@
       height: 100%;
       z-index: 0;
       opacity: 0.15;
+      display: none; /* Hide canvas until page is loaded */
     }
     .container {
       position: relative;
@@ -37,11 +38,14 @@
     #challenge, #success, #finalSuccess {
       display: none;
     }
+    #challenge {
+      display: block; /* Show challenge section by default */
+    }
     .neon-button {
       background: transparent;
       border: 2px solid #ffcc00;
       color: #ffcc00;
-      font-family: 'Orbitron', monospace;
+      font-family: 'Orbitron', monospace, sans-serif;
       padding: 10px 20px;
       border-radius: 5px;
       transition: all 0.3s ease;
@@ -75,7 +79,7 @@
       <h1 class="text-3xl font-bold mb-4 text-shadow-[0_0_10px_#ffcc00]">Nakamoto Enigma</h1>
       <p id="challengeLevel">Challenge Level: <span id="level">1</span></p>
       <p id="prompt">Seek the genesis block’s hidden pulse within the encrypted code’s final key. Strike with precision (±0.5 seconds) after the 3-second countdown.</p>
-      <p id="encryptedCode">Encrypted Code: <span id="code"></span></p>
+      <p id="encryptedCode">Encrypted Code: <span id="code">Loading...</span></p>
       <p id="attemptsLeft">Attempts Left: <span id="attempts">3</span></p>
       <div id="countdown" style="display: none;"></div>
       <div id="timer" style="display: none;">0.00</div>
@@ -207,6 +211,7 @@
     }
 
     function startChallenge() {
+      fetchChallenge(); // Fetch challenge when starting
       document.getElementById('startButton').style.display = 'none';
       document.getElementById('countdown').style.display = 'block';
       let countdown = 3;
@@ -354,37 +359,39 @@
     });
     document.getElementById('postMessageButton').addEventListener('click', postMessage);
 
-    const canvas = document.getElementById('glitchCanvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-    let lastDraw = 0;
-    function drawGlitch(timestamp) {
-      if (timestamp - lastDraw < 100) {
-        requestAnimationFrame(drawGlitch);
-        return;
-      }
-      lastDraw = timestamp;
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.strokeStyle = 'rgba(255, 204, 0, 0.1)';
-      ctx.lineWidth = 1;
-      for (let i = 0; i < 5; i++) {
-        const x = Math.random() * canvas.width;
-        const y = Math.random() * canvas.height;
-        ctx.beginPath();
-        ctx.moveTo(x, y);
-        ctx.lineTo(x + Math.random() * 50 - 25, y + Math.random() * 50 - 25);
-        ctx.stroke();
-      }
-      requestAnimationFrame(drawGlitch);
-    }
-    requestAnimationFrame(drawGlitch);
-    window.addEventListener('resize', () => {
+    // Initialize canvas after window load to reduce initial rendering
+    window.addEventListener('load', () => {
+      const canvas = document.getElementById('glitchCanvas');
+      canvas.style.display = 'block';
+      const ctx = canvas.getContext('2d');
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      let lastDraw = 0;
+      function drawGlitch(timestamp) {
+        if (timestamp - lastDraw < 200) { // Increased to 200ms
+          requestAnimationFrame(drawGlitch);
+          return;
+        }
+        lastDraw = timestamp;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = 'rgba(255, 204, 0, 0.1)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 5; i++) {
+          const x = Math.random() * canvas.width;
+          const y = Math.random() * canvas.height;
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x + Math.random() * 50 - 25, y + Math.random() * 50 - 25);
+          ctx.stroke();
+        }
+        requestAnimationFrame(drawGlitch);
+      }
+      requestAnimationFrame(drawGlitch);
+      window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
     });
-
-    document.addEventListener('DOMContentLoaded', fetchChallenge);
   </script>
 </body>
 </html>
