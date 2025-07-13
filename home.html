@@ -68,6 +68,10 @@
     .neon-link:hover {
       text-shadow: 0 0 10px #ffcc00;
     }
+    #countdown, #timer {
+      font-size: 2em;
+      margin: 20px 0;
+    }
   </style>
 </head>
 <body>
@@ -76,15 +80,18 @@
     <div id="challenge">
       <h1 class="text-3xl font-bold mb-4 text-shadow-[0_0_10px_#ffcc00]">Nakamoto Enigma</h1>
       <p id="challengeLevel">Challenge Level: <span id="level">1</span></p>
-      <p id="cipherType">Cipher Type: <span id="type">Caesar Cipher</span></p>
+      <p id="prompt">Select a level to begin the challenge.</p>
       <p id="encryptedCode">Encrypted Code: <span id="code"></span></p>
-      <p id="keyHint">Key Hint: <span id="hint"></span></p>
       <p id="attemptsLeft">Attempts Left: <span id="attempts">3</span></p>
+      <div id="countdown" style="display: none;"></div>
+      <div id="timer" style="display: none;">0.00</div>
+      <button id="startButton" class="neon-button mt-4">Start Challenge</button>
+      <button id="stopButton" class="neon-button mt-4" style="display: none;">Stop Timer</button>
+      <input id="nameInput" type="text" placeholder="Enter your name" class="mt-4 p-2 bg-[#1a1a1a] text-[#ffcc00] border-2 border-[#ffcc00] rounded" value="ivf2">
+      <input id="decodedInput" type="text" placeholder="Timing result" class="mt-4 p-2 bg-[#1a1a1a] text-[#ffcc00] border-2 border-[#ffcc00] rounded" disabled>
+      <button id="submitButton" class="neon-button mt-4" disabled>Submit</button>
       <p id="response" class="mt-4"></p>
       <p id="challengeMessage" class="mt-4"></p>
-      <input id="nameInput" type="text" placeholder="Enter your name" class="mt-4 p-2 bg-[#1a1a1a] text-[#ffcc00] border-2 border-[#ffcc00] rounded">
-      <input id="decodedInput" type="text" placeholder="Enter decoded message" class="mt-4 p-2 bg-[#1a1a1a] text-[#ffcc00] border-2 border-[#ffcc00] rounded">
-      <button id="decryptButton" class="neon-button mt-4">Decrypt</button>
       <footer class="mt-8">
         <a href="https://nakamotosatoshi.ai" class="neon-link">Home</a>
         <a href="https://nakamotosatoshi.ai/privacy-policy.html" class="neon-link">Privacy Policy</a>
@@ -110,7 +117,7 @@
     </div>
     <div id="finalSuccess">
       <h1 class="text-3xl font-bold mb-4 text-shadow-[0_0_10px_#ffcc00]">Master of the Enigma!</h1>
-      <p class="mb-4">You have mastered all Nakamoto Ciphers!</p>
+      <p class="mb-4">You have mastered all Nakamoto Challenges!</p>
       <p class="mb-4">Join thousands of solvers! Share your triumph!</p>
       <button id="finalShareButton" class="neon-button">Share Victory</button>
       <p id="shareMessage">Share on your favorite platform!</p>
@@ -132,29 +139,36 @@
     </div>
   </div>
   <script>
-    const userId = Math.random().toString(36).substring(2, 15);
+    const userId = 'test123'; // Fixed for testing, or use Math.random().toString(36).substring(2, 15)
     let currentLevel = 1;
     let encryptedMessage = '';
-    let keyHint = '';
     let attemptsLeft = 3;
-    let cipherType = '';
+    let timerInterval;
+    let startTime;
+
+    function getPrompt(level) {
+      if (level === 1) {
+        return 'Capture a micro-moment of the genesis block. Stop the timer between 5.00–10.00 seconds (±0.5 seconds) after the 3-second countdown.';
+      } else if (level === 2) {
+        return 'Capture the whitepaper’s micro-moment. Stop the timer between 5.00–10.00 seconds (±0.2 seconds) after the 3-second countdown.';
+      } else {
+        return 'Capture the first halving’s exact micro-moment. Stop the timer between 5.00–10.00 seconds (±0.05 seconds) after the 3-second countdown.';
+      }
+    }
 
     function fetchChallenge() {
       const name = document.getElementById('nameInput').value || 'Anonymous';
-      fetch(`https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}&name=${encodeURIComponent(name)}&level=${currentLevel}`)
+      fetch(`https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}&name=${encodeURIComponent(name)}&level=${currentLevel}&attempts=${attemptsLeft}&input=`)
         .then(response => response.json())
         .then(data => {
           document.getElementById('level').textContent = data.level;
-          document.getElementById('type').textContent = data.cipherType;
           document.getElementById('code').textContent = data.encrypted;
-          document.getElementById('hint').textContent = data.keyHint;
           document.getElementById('attempts').textContent = data.attemptsLeft;
           document.getElementById('response').textContent = data.response || '';
           document.getElementById('challengeMessage').textContent = data.challengeMessage || '';
+          document.getElementById('prompt').textContent = getPrompt(data.level);
           encryptedMessage = data.encrypted;
-          keyHint = data.keyHint;
           attemptsLeft = data.attemptsLeft;
-          cipherType = data.cipherType;
           if (data.progress >= 1) {
             document.getElementById('challenge').style.display = 'none';
             document.getElementById('success').style.display = 'block';
@@ -169,27 +183,72 @@
             document.getElementById('challenge').style.display = 'block';
             document.getElementById('success').style.display = 'none';
             document.getElementById('finalSuccess').style.display = 'none';
+            document.getElementById('startButton').style.display = 'block';
+            document.getElementById('stopButton').style.display = 'none';
+            document.getElementById('timer').style.display = 'none';
+            document.getElementById('decodedInput').value = '';
+            document.getElementById('decodedInput').setAttribute('disabled', true);
+            document.getElementById('submitButton').setAttribute('disabled', true);
           }
+        })
+        .catch(error => {
+          document.getElementById('response').textContent = `Error: ${error.message}`;
         });
     }
 
-    function checkChallenge() {
+    function startChallenge() {
+      document.getElementById('startButton').style.display = 'none';
+      document.getElementById('countdown').style.display = 'block';
+      let countdown = 3;
+      document.getElementById('countdown').textContent = countdown;
+      const countdownInterval = setInterval(() => {
+        countdown--;
+        if (countdown > 0) {
+          document.getElementById('countdown').textContent = countdown;
+        } else if (countdown === 0) {
+          document.getElementById('countdown').textContent = 'Go!';
+        } else {
+          clearInterval(countdownInterval);
+          document.getElementById('countdown').style.display = 'none';
+          document.getElementById('timer').style.display = 'block';
+          document.getElementById('stopButton').style.display = 'block';
+          startTimer();
+        }
+      }, 1000);
+    }
+
+    function startTimer() {
+      startTime = Date.now();
+      timerInterval = setInterval(() => {
+        const elapsed = (Date.now() - startTime) / 1000;
+        document.getElementById('timer').textContent = elapsed.toFixed(2);
+      }, 10);
+    }
+
+    function stopTimer() {
+      clearInterval(timerInterval);
+      const elapsed = (Date.now() - startTime) / 1000;
+      const input = Math.floor(elapsed * 100).toString().padStart(4, '0');
+      document.getElementById('decodedInput').value = input;
+      document.getElementById('decodedInput').setAttribute('readonly', true);
+      document.getElementById('decodedInput').removeAttribute('disabled');
+      document.getElementById('submitButton').removeAttribute('disabled');
+      document.getElementById('stopButton').style.display = 'none';
+    }
+
+    function submitAnswer() {
       const input = document.getElementById('decodedInput').value;
       const name = document.getElementById('nameInput').value || 'Anonymous';
-      fetch(`https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}&input=${encodeURIComponent(input)}&encrypted=${encodeURIComponent(encryptedMessage)}&keyHint=${encodeURIComponent(keyHint)}&attempts=${attemptsLeft}&name=${encodeURIComponent(name)}&level=${currentLevel}`)
+      fetch(`https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=checkChallenge&userId=${userId}&input=${encodeURIComponent(input)}&encrypted=${encodeURIComponent(encryptedMessage)}&attempts=${attemptsLeft}&name=${encodeURIComponent(name)}&level=${currentLevel}`)
         .then(response => response.json())
         .then(data => {
           document.getElementById('response').textContent = data.response || '';
           document.getElementById('challengeMessage').textContent = data.challengeMessage || '';
           document.getElementById('level').textContent = data.level;
-          document.getElementById('type').textContent = data.cipherType;
           document.getElementById('code').textContent = data.encrypted;
-          document.getElementById('hint').textContent = data.keyHint;
           document.getElementById('attempts').textContent = data.attemptsLeft;
           encryptedMessage = data.encrypted;
-          keyHint = data.keyHint;
           attemptsLeft = data.attemptsLeft;
-          cipherType = data.cipherType;
           if (data.progress >= 1) {
             document.getElementById('challenge').style.display = 'none';
             document.getElementById('success').style.display = 'block';
@@ -200,7 +259,20 @@
               document.getElementById('finalSuccess').style.display = 'block';
               fetchMessages();
             }
+          } else {
+            document.getElementById('challenge').style.display = 'block';
+            document.getElementById('success').style.display = 'none';
+            document.getElementById('finalSuccess').style.display = 'none';
+            document.getElementById('startButton').style.display = 'block';
+            document.getElementById('stopButton').style.display = 'none';
+            document.getElementById('timer').style.display = 'none';
+            document.getElementById('decodedInput').value = '';
+            document.getElementById('decodedInput').setAttribute('disabled', true);
+            document.getElementById('submitButton').setAttribute('disabled', true);
           }
+        })
+        .catch(error => {
+          document.getElementById('response').textContent = `Error: ${error.message}`;
         });
     }
 
@@ -225,7 +297,7 @@
 
     function shareSuccess() {
       const name = document.getElementById('nameInput').value || 'Anonymous';
-      const shareText = `I have unraveled the Nakamoto Cipher at Level ${currentLevel}! UserID: ${userId} - Join the enigma at https://nakamotosatoshi.ai`;
+      const shareText = `I have conquered Nakamoto Enigma Level ${currentLevel}! UserID: ${userId} - Join the challenge at https://nakamotosatoshi.ai`;
       const imageData = generateImage();
       if (navigator.share && navigator.canShare && navigator.canShare({ files: [] })) {
         fetch(imageData)
@@ -279,7 +351,9 @@
       }
     }
 
-    document.getElementById('decryptButton').addEventListener('click', checkChallenge);
+    document.getElementById('startButton').addEventListener('click', startChallenge);
+    document.getElementById('stopButton').addEventListener('click', stopTimer);
+    document.getElementById('submitButton').addEventListener('click', submitAnswer);
     document.getElementById('nextChallengeButton').addEventListener('click', () => {
       currentLevel++;
       document.getElementById('challenge').style.display = 'block';
