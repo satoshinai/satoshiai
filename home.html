@@ -74,7 +74,7 @@
     <div id="challenge">
       <h1 class="text-3xl font-bold mb-4 text-shadow-[0_0_10px_#ffcc00]">Nakamoto Enigma</h1>
       <p id="challengeLevel">Challenge Level: <span id="level">1</span></p>
-      <p id="prompt">Select a level to begin the challenge.</p>
+      <p id="prompt">Seek the genesis block’s hidden pulse within the encrypted code’s final key. Strike with precision (±0.5 seconds) after the 3-second countdown.</p>
       <p id="encryptedCode">Encrypted Code: <span id="code"></span></p>
       <p id="attemptsLeft">Attempts Left: <span id="attempts">3</span></p>
       <div id="countdown" style="display: none;"></div>
@@ -139,9 +139,9 @@
     let cachedChallenge = null;
 
     function getPrompt(level) {
-      if (level === 1) return 'Capture a micro-moment of the genesis block. Stop the timer between 5.00–10.00 seconds (±0.5 seconds) after the 3-second countdown.';
-      if (level === 2) return 'Capture the whitepaper’s micro-moment. Stop the timer between 5.00–10.00 seconds (±0.2 seconds) after the 3-second countdown.';
-      return 'Capture the first halving’s exact micro-moment. Stop the timer between 5.00–10.00 seconds (±0.05 seconds) after the 3-second countdown.';
+      if (level === 1) return 'Seek the genesis block’s hidden pulse within the encrypted code’s final key. Strike with precision (±0.5 seconds) after the 3-second countdown.';
+      if (level === 2) return 'Unveil the whitepaper’s fleeting truth in the code’s closing cipher. Time your strike within ±0.2 seconds after the 3-second countdown.';
+      return 'Master the halving’s essence, locked in the code’s ultimate secret. Stop the timer with exactitude (±0.05 seconds) after the 3-second countdown.';
     }
 
     function updateChallengeUI(data) {
