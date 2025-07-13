@@ -3,53 +3,120 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nakamoto Enigma Leaderboard</title>
+  <title>Nakamoto Enigma - Leaderboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    body { font-family: 'Courier New', monospace; background: #1a1a1a; color: #e0e0e0; text-align: center; padding: 50px; }
-    h1 { font-size: 2.5em; color: #ffcc00; }
-    .container { max-width: 600px; margin: 0 auto; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 10px; border: 1px solid #ffcc00; }
-    th { background: #333; }
-    a { color: #ffcc00; text-decoration: none; }
-    a:hover { text-decoration: underline; }
+    body {
+      font-family: 'Orbitron', monospace;
+      background: #0d0d0d;
+      color: #ffcc00;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      opacity: 0.2;
+    }
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 90%;
+      text-align: center;
+      padding: 20px;
+    }
+    .neon-link {
+      color: #ffcc00;
+      text-decoration: none;
+      margin: 0 10px;
+      transition: all 0.3s ease;
+    }
+    .neon-link:hover {
+      text-shadow: 0 0 10px #ffcc00;
+    }
+    #winnersList {
+      max-width: 600px;
+      margin: 20px auto;
+      text-align: left;
+    }
+    #winnersList li {
+      margin: 10px 0;
+      padding: 10px;
+      background: #1a1a1a;
+      border: 1px solid #ffcc00;
+      border-radius: 5px;
+    }
   </style>
 </head>
 <body>
+  <canvas id="glitchCanvas"></canvas>
   <div class="container">
-    <h1>Nakamoto Enigma Leaderboard</h1>
-    <p>The enlightened who have conquered the ciphers...</p>
-    <table id="leaderboard">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Level</th>
-          <th>Timestamp</th>
-        </tr>
-      </thead>
-      <tbody id="leaderboardBody"></tbody>
-    </table>
-    <p><a href="index.html">Return to Challenge</a></p>
-    <p><a href="https://satoshinai.github.io/satoshiai/privacy-policy.html" target="_blank">Privacy Veil</a></p>
+    <h1 class="text-3xl font-bold mb-4 text-shadow-[0_0_10px_#ffcc00]">Nakamoto Enigma Leaderboard</h1>
+    <p class="mb-4">Masters of the Enigma (Level 3)</p>
+    <ul id="winnersList"></ul>
+    <footer class="mt-8">
+      <a href="https://nakamotosatoshi.ai" class="neon-link">Home</a>
+      <a href="https://nakamotosatoshi.ai/privacy-policy.html" class="neon-link">Privacy Policy</a>
+      <a href="https://nakamotosatoshi.ai/messages.html" class="neon-link">Victory Messages</a>
+      <a href="https://nakamotosatoshi.ai/genius-forum.html" class="neon-link">Genius Forum</a>
+    </footer>
   </div>
-
   <script>
-    fetch(`https://script.google.com/macros/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=getWinners`)
-      .then(response => response.json())
-      .then(data => {
-        const tbody = document.getElementById('leaderboardBody');
-        data.winners.forEach(winner => {
-          const [ name, level, timestamp] = winner.split(' - ');
-          const row = document.createElement('tr');
-          row.innerHTML = `
-            <td>${name}</td>
-            <td>${level}</td>
-            <td>${timestamp.replace('(Sealed: ', '').replace(')', '')}</td>
-          `;
-          tbody.appendChild(row);
+    function fetchWinners() {
+      fetch(`https://script.google.com/a/macros/nakamotosatoshi.ai/s/AKfycby4PDFuQ6iYlJd3CwW9_dgux7EB969fCxnOFaFk2oyva8syXYd4mHqoUlrASySXUYiQ/exec?action=getWinners`)
+        .then(response => response.json())
+        .then(data => {
+          const winnersList = document.getElementById('winnersList');
+          winnersList.innerHTML = '';
+          data.winners.forEach(winner => {
+            const li = document.createElement('li');
+            li.textContent = winner; // Format: name - Level 3 - timestamp
+            winnersList.appendChild(li);
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching winners:', error);
+          document.getElementById('winnersList').innerHTML = '<li>Error loading leaderboard</li>';
         });
-      })
-      .catch(error => console.error('Error fetching leaderboard:', error));
+    }
+
+    const canvas = document.getElementById('glitchCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    function drawGlitch() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = 'rgba(255, 204, 0, 0.1)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 10; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + Math.random() * 50 - 25, y + Math.random() * 50 - 25);
+        ctx.stroke();
+      }
+    }
+    function animate() {
+      drawGlitch();
+      requestAnimationFrame(animate);
+    }
+    animate();
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    });
+
+    document.addEventListener('DOMContentLoaded', fetchWinners);
   </script>
 </body>
 </html>
