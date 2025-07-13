@@ -139,7 +139,7 @@
     </div>
   </div>
   <script>
-    const userId = 'Math.random().toString(36).substring(2, 15)'; // Fixed for testing, or use Math.random().toString(36).substring(2, 15)
+    const userId = Math.random().toString(36).substring(2, 15); // Dynamic random userId
     let currentLevel = 1;
     let encryptedMessage = '';
     let attemptsLeft = 3;
@@ -403,7 +403,7 @@
       canvas.height = window.innerHeight;
     });
 
-    fetchChallenge();
+    document.addEventListener('DOMContentLoaded', fetchChallenge);
   </script>
 </body>
 </html>
