@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nakamoto Enigma - Challenge</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
-  <script src="https://cdn.tailwindcss.com" defer></script>
   <style>
     body {
       font-family: 'Orbitron', monospace;
@@ -66,6 +65,33 @@
       font-size: 2em;
       margin: 20px 0;
     }
+    /* Tailwind CSS 提取的樣式 */
+    .flex { display: flex; }
+    .justify-center { justify-content: center; }
+    .space-x-4 > * + * { margin-left: 16px; }
+    .mt-4 { margin-top: 16px; }
+    .mt-8 { margin-top: 32px; }
+    .mt-2 { margin-top: 8px; }
+    .mb-4 { margin-bottom: 16px; }
+    .text-3xl { font-size: 30px; line-height: 36px; }
+    .text-xl { font-size: 20px; line-height: 28px; }
+    .font-bold { font-weight: 700; }
+    .text-shadow-\[0_0_10px_\#ffcc00\] { text-shadow: 0 0 10px #ffcc00; }
+    .text-left { text-align: left; }
+    .max-w-md { max-width: 28rem; }
+    .mx-auto { margin-left: auto; margin-right: auto; }
+    .w-1\/3 { width: 33.333333%; }
+    .p-2 { padding: 8px; }
+    .bg-\[\#1a1a1a\] { background-color: #1a1a1a; }
+    .border-2 { border-width: 2px; }
+    .border-\[\#ffcc00\] { border-color: #ffcc00; }
+    .rounded { border-radius: 0.25rem; }
+    .bg-transparent { background-color: transparent; }
+    /* 占位符樣式 */
+    input::placeholder {
+      color: #ffffff;
+      opacity: 0.7;
+    }
   </style>
 </head>
 <body>
@@ -79,11 +105,17 @@
       <p id="attemptsLeft">Attempts Left: <span id="attempts">3</span></p>
       <div id="countdown" style="display: none;"></div>
       <div id="timer" style="display: none;">0.00</div>
-      <button id="startButton" class="neon-button mt-4">Start Challenge</button>
-      <button id="stopButton" class="neon-button mt-4" style="display: none;">Stop Timer</button>
-      <input id="nameInput" type="text" placeholder="Enter your name" class="mt-4 p-2 bg-[#1a1a1a] text-[#ffcc00] border-2 border-[#ffcc00] rounded" value="ivf2">
-      <input id="decodedInput" type="text" placeholder="Timing result" class="mt-4 p-2 bg-[#1a1a1a] text-[#ffcc00] border-2 border-[#ffcc00] rounded" disabled>
-      <button id="submitButton" class="neon-button mt-4" disabled>Submit</button>
+      <div class="flex justify-center space-x-4">
+        <button id="startButton" class="neon-button">Start Challenge</button>
+        <button id="stopButton" class="neon-button" style="display: none;">Stop Timer</button>
+      </div>
+      <div class="flex justify-center space-x-4 mt-4">
+        <input id="nameInput" type="text" placeholder="YOUR NAME" class="p-2 bg-[#1a1a1a] text-[#ffcc00] border-2 border-[#ffcc00] rounded w-1/3">
+        <input id="decodedInput" type="text" placeholder="Timing result" class="p-2 bg-[#1a1a1a] text-[#ffcc00] border-2 border-[#ffcc00] rounded w-1/3" disabled>
+      </div>
+      <div class="flex justify-center mt-4">
+        <button id="submitButton" class="neon-button" disabled>Submit</button>
+      </div>
       <p id="response" class="mt-4"></p>
       <p id="challengeMessage" class="mt-4"></p>
       <footer class="mt-8">
@@ -97,7 +129,9 @@
     <div id="success">
       <h1 class="text-3xl font-bold mb-4 text-shadow-[0_0_10px_#ffcc00]">Success!</h1>
       <p id="successMessage" class="mb-4"></p>
-      <button id="nextChallengeButton" class="neon-button">Next Challenge</button>
+      <div class="flex justify-center">
+        <button id="nextChallengeButton" class="neon-button">Next Challenge</button>
+      </div>
       <footer class="mt-8">
         <a href="https://nakamotosatoshi.ai" class="neon-link">Home</a>
         <a href="https://nakamotosatoshi.ai/privacy-policy.html" class="neon-link">Privacy Policy</a>
@@ -110,15 +144,19 @@
       <h1 class="text-3xl font-bold mb-4 text-shadow-[0_0_10px_#ffcc00]">Master of the Enigma!</h1>
       <p class="mb-4">You have mastered all Nakamoto Challenges!</p>
       <p class="mb-4">Join thousands of solvers! Share your triumph!</p>
-      <button id="finalShareButton" class="neon-button">Share Victory</button>
-      <p id="shareMessage">Share on your favorite platform!</p>
-      <button id="finalGenerateImageButton" class="neon-button">Generate Shareable Image</button>
-      <button onclick="window.location.href='https://nowpayments.io/payment?iid=5299822104'" class="neon-button">Fuel the Network</button>
+      <div class="flex justify-center space-x-4">
+        <button id="finalShareButton" class="neon-button">Share Victory</button>
+        <button id="finalGenerateImageButton" class="neon-button">Generate Shareable Image</button>
+        <button onclick="window.location.href='https://nowpayments.io/payment?iid=5299822104'" class="neon-button">Fuel the Network</button>
+      </div>
+      <p id="shareMessage" class="mt-4">Share on your favorite platform!</p>
       <div class="mt-4">
         <h2 class="text-xl font-bold">Victory Messages</h2>
         <div id="messages" class="mt-2 text-left max-w-md mx-auto"></div>
-        <input id="messageInput" type="text" placeholder="Max 10 chars" maxlength="10" class="mt-4 p-2 bg-[#1a1a1a] text-[#ffcc00] border-2 border-[#ffcc00] rounded">
-        <button id="postMessageButton" class="neon-button mt-4">Post Message</button>
+        <div class="flex justify-center mt-4">
+          <input id="messageInput" type="text" placeholder="Max 10 chars" maxlength="10" class="p-2 bg-[#1a1a1a] text-[#ffcc00] border-2 border-[#ffcc00] rounded w-1/3">
+          <button id="postMessageButton" class="neon-button ml-4">Post Message</button>
+        </div>
       </div>
       <footer class="mt-8">
         <a href="https://nakamotosatoshi.ai" class="neon-link">Home</a>
