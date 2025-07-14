@@ -38,11 +38,22 @@
       display: none;
     }
     #loading {
-      font-size: 2em;
+      font-size: 3em;
+      font-weight: 700;
       border: 2px solid #ffcc00;
       padding: 20px;
       border-radius: 5px;
       box-shadow: 0 0 10px #ffcc00;
+      animation: pulse 1.5s ease-in-out infinite, neon-flicker 0.5s ease-in-out infinite alternate;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    @keyframes neon-flicker {
+      0% { text-shadow: 0 0 5px #ffcc00, 0 0 10px #ffcc00; box-shadow: 0 0 10px #ffcc00; }
+      100% { text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00; box-shadow: 0 0 20px #ffcc00; }
     }
     .neon-button {
       background: transparent;
@@ -102,10 +113,10 @@
       <p id="challengeMessage" class="mt-4"></p>
       <footer class="mt-8">
         <a href="https://nakamotosatoshi.ai" class="neon-link">Home</a>
+        <a href="https://nakamotosatoshi.ai/privacy-policy.html" class="neon-link">Privacy Policy</a>
         <a href="https://nakamotosatoshi.ai/leaderboard.html" class="neon-link">Leaderboard</a>
         <a href="https://nakamotosatoshi.ai/messages.html" class="neon-link">Victory Messages</a>
         <a href="https://nakamotosatoshi.ai/genius-forum.html" class="neon-link">Genius Forum</a>
-        <a href="https://nakamotosatoshi.ai/privacy-policy.html" class="neon-link">Privacy Policy</a>
       </footer>
     </div>
     <div id="success">
@@ -116,10 +127,10 @@
       </div>
       <footer class="mt-8">
         <a href="https://nakamotosatoshi.ai" class="neon-link">Home</a>
+        <a href="https://nakamotosatoshi.ai/privacy-policy.html" class="neon-link">Privacy Policy</a>
         <a href="https://nakamotosatoshi.ai/leaderboard.html" class="neon-link">Leaderboard</a>
         <a href="https://nakamotosatoshi.ai/messages.html" class="neon-link">Victory Messages</a>
         <a href="https://nakamotosatoshi.ai/genius-forum.html" class="neon-link">Genius Forum</a>
-        <a href="https://nakamotosatoshi.ai/privacy-policy.html" class="neon-link">Privacy Policy</a>
       </footer>
     </div>
     <div id="finalSuccess">
@@ -142,10 +153,10 @@
       </div>
       <footer class="mt-8">
         <a href="https://nakamotosatoshi.ai" class="neon-link">Home</a>
+        <a href="https://nakamotosatoshi.ai/privacy-policy.html" class="neon-link">Privacy Policy</a>
         <a href="https://nakamotosatoshi.ai/leaderboard.html" class="neon-link">Leaderboard</a>
         <a href="https://nakamotosatoshi.ai/messages.html" class="neon-link">Victory Messages</a>
         <a href="https://nakamotosatoshi.ai/genius-forum.html" class="neon-link">Genius Forum</a>
-        <a href="https://nakamotosatoshi.ai/privacy-policy.html" class="neon-link">Privacy Policy</a>
       </footer>
     </div>
   </div>
