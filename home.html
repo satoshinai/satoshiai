@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Nakamoto Enigma - Challenge</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" fetchpriority="low">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" style="font-display: swap;">
   <script src="https://cdn.tailwindcss.com" defer></script>
   <style>
     body {
@@ -26,7 +26,7 @@
       height: 100%;
       z-index: 0;
       opacity: 0.15;
-      display: none; /* Hide canvas until page is loaded */
+      display: none; /* Delay canvas rendering */
     }
     .container {
       position: relative;
@@ -39,7 +39,7 @@
       display: none;
     }
     #challenge {
-      display: block; /* Show challenge section by default */
+      display: block; /* Show challenge section initially */
     }
     .neon-button {
       background: transparent;
@@ -79,7 +79,7 @@
       <h1 class="text-3xl font-bold mb-4 text-shadow-[0_0_10px_#ffcc00]">Nakamoto Enigma</h1>
       <p id="challengeLevel">Challenge Level: <span id="level">1</span></p>
       <p id="prompt">Seek the genesis block’s hidden pulse within the encrypted code’s final key. Strike with precision (±0.5 seconds) after the 3-second countdown.</p>
-      <p id="encryptedCode">Encrypted Code: <span id="code">Loading...</span></p>
+      <p id="encryptedCode">Encrypted Code: <span id="code">Click Start to reveal</span></p>
       <p id="attemptsLeft">Attempts Left: <span id="attempts">3</span></p>
       <div id="countdown" style="display: none;"></div>
       <div id="timer" style="display: none;">0.00</div>
@@ -211,11 +211,15 @@
     }
 
     function startChallenge() {
-      fetchChallenge(); // Fetch challenge when starting
       document.getElementById('startButton').style.display = 'none';
       document.getElementById('countdown').style.display = 'block';
       let countdown = 3;
       document.getElementById('countdown').textContent = countdown;
+      // Start canvas animation
+      document.getElementById('glitchCanvas').style.display = 'block';
+      requestAnimationFrame(drawGlitch);
+      // Fetch challenge data
+      fetchChallenge();
       const countdownInterval = setInterval(() => {
         countdown--;
         if (countdown > 0) {
@@ -273,7 +277,7 @@
       ctx.fillStyle = '#0d0d0d';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
       ctx.fillStyle = '#ffcc00';
-      ctx.font = '16px Orbitron';
+      ctx.font = '16px Orbitron, monospace';
       ctx.textAlign = 'center';
       ctx.fillText('Nakamoto Enigma Victory!', canvas.width / 2, 30);
       ctx.fillText(`Level ${currentLevel} Conquered`, canvas.width / 2, 60);
@@ -359,38 +363,34 @@
     });
     document.getElementById('postMessageButton').addEventListener('click', postMessage);
 
-    // Initialize canvas after window load to reduce initial rendering
-    window.addEventListener('load', () => {
-      const canvas = document.getElementById('glitchCanvas');
-      canvas.style.display = 'block';
-      const ctx = canvas.getContext('2d');
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      let lastDraw = 0;
-      function drawGlitch(timestamp) {
-        if (timestamp - lastDraw < 200) { // Increased to 200ms
-          requestAnimationFrame(drawGlitch);
-          return;
-        }
-        lastDraw = timestamp;
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.strokeStyle = 'rgba(255, 204, 0, 0.1)';
-        ctx.lineWidth = 1;
-        for (let i = 0; i < 5; i++) {
-          const x = Math.random() * canvas.width;
-          const y = Math.random() * canvas.height;
-          ctx.beginPath();
-          ctx.moveTo(x, y);
-          ctx.lineTo(x + Math.random() * 50 - 25, y + Math.random() * 50 - 25);
-          ctx.stroke();
-        }
+    const canvas = document.getElementById('glitchCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let lastDraw = 0;
+    function drawGlitch(timestamp) {
+      if (timestamp - lastDraw < 100) {
         requestAnimationFrame(drawGlitch);
+        return;
+      }
+      lastDraw = timestamp;
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.strokeStyle = 'rgba(255, 204, 0, 0.1)';
+      ctx.lineWidth = 1;
+      for (let i = 0; i < 5; i++) {
+        const x = Math.random() * canvas.width;
+        const y = Math.random() * canvas.height;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + Math.random() * 50 - 25, y + Math.random() * 50 - 25);
+        ctx.stroke();
       }
       requestAnimationFrame(drawGlitch);
-      window.addEventListener('resize', () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-      });
+    }
+
+    window.addEventListener('resize', () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
     });
   </script>
 </body>
