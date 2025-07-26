@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Bitcoin Update - NakamotoSatoshi.ai</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <script src="https://cdn.tailwindcss.com" defer></script>
+  <style>
+    body {
+      font-family: 'Orbitron', monospace;
+      background: #0d0d0d;
+      color: #ffcc00;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      opacity: 0.15;
+    }
+    .container {
+      position: relative;
+      z-index: 1;
+      max-width: 90%;
+      text-align: center;
+      padding: 20px;
+    }
+    .satoshi-index {
+      font-size: 10rem;
+      font-weight: 700;
+      color: #ffcc00;
+      text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00;
+      animation: neon-flicker 0.5s ease-in-out infinite alternate;
+      margin: 20px 0;
+    }
+    @keyframes neon-flicker {
+      0% { text-shadow: 0 0 5px #ffcc00, 0 0 10px #ffcc00; }
+      100% { text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00; }
+    }
+    .summary {
+      font-size: 1rem;
+      line-height: 1.6;
+      color: #ffcc00;
+      max-width: 600px;
+      margin: 20px auto;
+      text-shadow: 0 0 5px #ffcc00;
+    }
+    .date {
+      font-size: 0.9rem;
+      color: #ffcc00;
+      opacity: 0.8;
+      margin-top: 10px;
+    }
+    .neon-link {
+      color: #ffcc00;
+      text-decoration: none;
+      margin: 0 10px;
+      transition: all 0.3s ease;
+    }
+    .neon-link:hover {
+      text-shadow: 0 0 10px #ffcc00;
+    }
+    #loading {
+      font-size: 3em;
+      font-weight: 700;
+      border: 2px solid #ffcc00;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 0 10px #ffcc00;
+      animation: pulse 1.5s ease-in-out infinite, neon-flicker 0.5s ease-in-out infinite alternate;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+      100% { transform: scale(1); }
+    }
+    @media (max-width: 600px) {
+      .satoshi-index { font-size: 5rem; }
+      .summary { font-size: 0.9rem; }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="glitchCanvas"></canvas>
+  <div class="container">
+    <div id="loading" class="flex justify-center items-center">LOADING</div>
+    <div id="content" style="display: none;">
+      <div class="satoshi-index" id="satoshiIndex"></div>
+      <p class="summary" id="summary"></p>
+      <p class="date" id="date"></p>
+      <footer class="mt-8">
+        <a href="https://nakamotosatoshi.ai" class="neon-link">Home</a>
+        <a href="https://nakamotosatoshi.ai/notify.html" class="neon-link">Set Notification</a>
+        <a href="https://nakamotosatoshi.ai/home.html" class="neon-link">Decode</a>
+        <a href="https://nakamotosatoshi.ai/privacy-policy.html" class="neon-link">Privacy Policy</a>
+      </footer>
+    </div>
+  </div>
+  <script>
+    function initCanvas() {
+      const canvas = document.getElementById('glitchCanvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      let lastDraw = 0;
+      function drawGlitch(timestamp) {
+        if (timestamp - lastDraw < 100) {
+          requestAnimationFrame(drawGlitch);
+          return;
+        }
+        lastDraw = timestamp;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.strokeStyle = 'rgba(255, 204, 0, 0.1)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < 5; i++) {
+          const x = Math.random() * canvas.width;
+          const y = Math.random() * canvas.height;
+          ctx.beginPath();
+          ctx.moveTo(x, y);
+          ctx.lineTo(x + Math.random() * 50 - 25, y + Math.random() * 50 - 25);
+          ctx.stroke();
+        }
+        requestAnimationFrame(drawGlitch);
+      }
+      requestAnimationFrame(drawGlitch);
+      window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      });
+    }
+
+    function fetchContent() {
+      document.getElementById('loading').style.display = 'block';
+      fetch('https://script.google.com/macros/s/AKfycbxjW6Y11H156cgv8t4F6G3X6ZivQYlQLZ_c2FOXXwEXBZ3g1xgYJgyAumseoYl1bRCp/exec?action=getDailyUpdate')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('satoshiIndex').textContent = data.satoshiIndex;
+          document.getElementById('summary').textContent = data.summary;
+          document.getElementById('date').textContent = `Updated: ${data.date}`;
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('content').style.display = 'block';
+          initCanvas();
+        })
+        .catch(error => {
+          document.getElementById('summary').textContent = `Error: ${error.message}`;
+          document.getElementById('loading').style.display = 'none';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchContent);
+  </script>
+</body>
+</html>
