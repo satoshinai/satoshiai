@@ -128,19 +128,27 @@
         messageDiv.textContent = 'Please enter a valid threshold (0-100).';
         return;
       }
-      console.log('Calling google.script.run with:', { email, threshold: parseFloat(threshold) });
-      google.script.run
-        .withSuccessHandler(() => {
-          console.log('Notification set successfully');
+      console.log('Sending fetch request with:', { email, threshold: parseFloat(threshold) });
+      fetch('https://script.google.com/macros/s/AKfycbxjW6Y11H156cgv8t4F6G3X6ZivQYlQLZ_c2FOXXwEXBZ3g1xgYJgyAumseoYl1bRCp/exec', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'setNotification', email, threshold: parseFloat(threshold) })
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Fetch response:', data);
+        if (data.status === 'success') {
           messageDiv.textContent = 'Notification set successfully!';
           document.getElementById('email').value = '';
           document.getElementById('threshold').value = '';
-        })
-        .withFailureHandler((error) => {
-          console.log('Error setting notification:', error);
-          messageDiv.textContent = `Error: ${error.message}`;
-        })
-        .setNotification(email, parseFloat(threshold));
+        } else {
+          messageDiv.textContent = `Error: ${data.error}`;
+        }
+      })
+      .catch(error => {
+        console.log('Fetch error:', error);
+        messageDiv.textContent = `Error: ${error.message}`;
+      });
     }
   </script>
 </body>
