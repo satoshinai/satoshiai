@@ -78,6 +78,13 @@
       box-shadow: 0 0 10px #ffcc00;
       animation: pulse 1.5s ease-in-out infinite, neon-flicker 0.5s ease-in-out infinite alternate;
     }
+    #error {
+      font-size: 1rem;
+      color: #ff3333;
+      max-width: 600px;
+      margin: 20px auto;
+      text-shadow: 0 0 5px #ff3333;
+    }
     @keyframes pulse {
       0% { transform: scale(1); }
       50% { transform: scale(1.1); }
@@ -97,11 +104,12 @@
       <div class="satoshi-index" id="satoshiIndex"></div>
       <p class="summary" id="summary"></p>
       <p class="date" id="date"></p>
+      <p id="error" style="display: none;"></p>
       <footer class="mt-8">
         <a href="https://nakamotosatoshi.ai" class="neon-link">Home</a>
-        <a href="https://nakamotosatoshi.ai/home.html" class="neon-link">Decode</a>
+        <a href="https://nakamotosatoshi.ai/home.html" class="neon-link">Decode me</a>
         <a href="https://nakamotosatoshi.ai/privacy-policy.html" class="neon-link">Privacy Policy</a>
-        <a href="https://nowpayments.io/donation/nakamotosatoshi" class="neon-link">Support me</a>
+        <a href="https://nowpayments.io/donation/nakamotosatoshi" class="neon-link">Support Me</a>
       </footer>
     </div>
   </div>
@@ -140,23 +148,30 @@
 
     function fetchContent() {
       document.getElementById('loading').style.display = 'block';
+      document.getElementById('content').style.display = 'none';
+      document.getElementById('error').style.display = 'none';
       fetch('https://script.google.com/macros/s/AKfycbxjW6Y11H156cgv8t4F6G3X6ZivQYlQLZ_c2FOXXwEXBZ3g1xgYJgyAumseoYl1bRCp/exec?action=getDailyUpdate')
         .then(response => response.json())
         .then(data => {
-          document.getElementById('satoshiIndex').textContent = data.satoshiIndex;
-          document.getElementById('summary').textContent = data.summary;
-          document.getElementById('date').textContent = `Updated: ${data.date}`;
+          document.getElementById('satoshiIndex').textContent = data.satoshiIndex || 'N/A';
+          document.getElementById('summary').textContent = data.summary || 'No summary available.';
+          document.getElementById('date').textContent = `Updated: ${data.date || 'Unknown'}`;
           document.getElementById('loading').style.display = 'none';
           document.getElementById('content').style.display = 'block';
-          initCanvas();
         })
         .catch(error => {
-          document.getElementById('summary').textContent = `Error: ${error.message}`;
+          document.getElementById('error').textContent = `Failed to load update: ${error.message}. Please try again later.`;
+          document.getElementById('error').style.display = 'block';
           document.getElementById('loading').style.display = 'none';
+          document.getElementById('content').style.display = 'block';
         });
     }
 
-    document.addEventListener('DOMContentLoaded', fetchContent);
+    document.addEventListener('DOMContentLoaded', () => {
+      initCanvas();
+      fetchContent();
+      setInterval(fetchContent, 6 * 60 * 60 * 1000); // Refresh every 6 hours
+    });
   </script>
 </body>
 </html>
