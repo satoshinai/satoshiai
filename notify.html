@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Satoshi Index Notification - NakamotoSatoshi.ai</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #ff4500; /* Neon orange */
+            font-family: 'Courier New', Courier, monospace;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            font-size: 3em;
+            text-shadow: 0 0 10px #ff4500, 0 0 20px #ff4500;
+            margin-bottom: 20px;
+        }
+        .container {
+            margin: 20px auto;
+            max-width: 400px;
+            padding: 20px;
+            background-color: #2a2a2a;
+            border: 2px solid #ff4500;
+            border-radius: 10px;
+            box-shadow: 0 0 15px #ff4500;
+        }
+        p {
+            font-size: 1.2em;
+            margin-bottom: 15px;
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            border: 1px solid #ff4500;
+            border-radius: 5px;
+            background-color: #1a1a1a;
+            color: #ff4500;
+            font-family: 'Courier New', Courier, monospace;
+            width: calc(100% - 22px); /* Adjust for padding and border */
+        }
+        button {
+            cursor: pointer;
+            background-color: #ff4500;
+            color: #1a1a1a;
+            border: none;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #ff6347; /* Slightly lighter neon orange */
+        }
+        .message {
+            margin-top: 20px;
+            font-size: 1.2em;
+            text-shadow: 0 0 5px #ff4500;
+        }
+        footer {
+            margin-top: 30px;
+            font-size: 0.9em;
+        }
+        footer a {
+            color: #ff4500;
+            text-decoration: none;
+            margin: 0 10px;
+            text-shadow: 0 0 5px #ff4500;
+        }
+        footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <h1>Satoshi Index Notification</h1>
+    <div class="container">
+        <p>Set a notification to receive an email when the Satoshi Index exceeds your chosen value.</p>
+        <input type="email" id="email" placeholder="Enter your email" required>
+        <input type="number" id="threshold" placeholder="Enter Satoshi Index threshold (0-100)" min="0" max="100" required>
+        <button onclick="submitNotification()">Set Notification</button>
+        <div id="message" class="message"></div>
+    </div>
+    <footer>
+        <a href="https://nakamotosatoshi.ai">Home</a> |
+        <a href="#">Privacy Policy</a>
+    </footer>
+    <script>
+        function submitNotification() {
+            const email = document.getElementById('email').value;
+            const threshold = document.getElementById('threshold').value;
+            const messageDiv = document.getElementById('message');
+
+            // Validate inputs
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                messageDiv.textContent = 'Please enter a valid email address.';
+                return;
+            }
+            if (!threshold || isNaN(threshold) || threshold < 0 || threshold > 100) {
+                messageDiv.textContent = 'Please enter a valid threshold (0-100).';
+                return;
+            }
+
+            // Send notification settings to Google Apps Script
+            google.script.run
+                .withSuccessHandler(() => {
+                    messageDiv.textContent = 'Notification set successfully!';
+                    document.getElementById('email').value = '';
+                    document.getElementById('threshold').value = '';
+                })
+                .withFailureHandler((error) => {
+                    messageDiv.textContent = `Error: ${error.message}`;
+                })
+                .setNotification(email, parseFloat(threshold));
+        }
+    </script>
+</body>
+</html>
