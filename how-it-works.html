@@ -3,51 +3,70 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>How It Works - NakamotoSatoshi.ai</title>
+  <title>Historical Data - NakamotoSatoshi.ai</title>
   <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
   <script src="https://cdn.tailwindcss.com" defer></script>
   <style>
     body { font-family: 'Orbitron', monospace; background: #0d0d0d; color: #ffcc00; padding: 20px; }
     .container { max-width: 800px; margin: auto; }
-    h1 { font-size: 2.5rem; text-shadow: 0 0 10px #ffcc00; text-align: center; margin-bottom: 20px; }
-    h2 { font-size: 1.5rem; color: #cc9900; margin-top: 20px; }
-    p { font-size: 1rem; line-height: 1.6; margin-bottom: 15px; }
-    ul { list-style-type: none; padding: 0; }
-    li { margin-bottom: 10px; font-size: 1rem; }
+    h1 { font-size: 2rem; text-shadow: 0 0 10px #ffcc00; text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 10px; border: 1px solid #ffcc00; text-align: center; }
+    th { background: #1a1a1a; }
+    td { background: #0d0d0d; }
     .neon-link { color: #ffcc00; text-decoration: none; margin: 0 10px; }
     .neon-link:hover { text-shadow: 0 0 10px #ffcc00; }
-    footer { text-align: center; margin-top: 40px; }
+    .loading { color: #cc9900; font-style: italic; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>How the Satoshi Index Works</h1>
-    <p>The Satoshi Index is a sophisticated metric designed to gauge the daily sentiment and market dynamics of Bitcoin. By analyzing a diverse set of data points, we provide a comprehensive score (0–100) that reflects Bitcoin’s market perception, updated daily at 8 AM AEST. Below, we outline the methodology behind the index and its components.</p>
-    
-    <h2>Methodology</h2>
-    <p>The Satoshi Index aggregates multiple signals to produce a balanced and insightful score. Each component is carefully weighted to capture different aspects of Bitcoin’s ecosystem, ensuring a robust and dynamic assessment. The index is calculated using advanced natural language processing (NLP), social media analysis, and historical trends, processed through a secure, cloud-based platform.</p>
-    
-    <h2>Components of the Satoshi Index</h2>
-    <ul>
-      <li><strong>General Sentiment (30%):</strong> Measures overall market sentiment by analyzing news articles and public discussions for positive or negative language related to Bitcoin.</li>
-      <li><strong>Price Sentiment (20%):</strong> Evaluates news and commentary specifically related to Bitcoin’s price movements, capturing bullish or bearish trends.</li>
-      <li><strong>Volume Sentiment (10%):</strong> Assesses trading activity mentions, reflecting market engagement and liquidity trends.</li>
-      <li><strong>NLP Sentiment (30%):</strong> Applies advanced NLP techniques to news content, quantifying emotional tone and sentiment intensity for a deeper understanding of market narratives.</li>
-      <li><strong>Social Media Sentiment (20%):</strong> Analyzes engagement and sentiment across major social platforms, providing insight into community enthusiasm and perception.</li>
-      <li><strong>Historical Trends (10%):</strong> Incorporates recent historical sentiment to contextualize daily fluctuations and identify longer-term patterns.</li>
-    </ul>
-    
-    <h2>Daily Update Process</h2>
-    <p>Each day, our system collects and processes data from various public sources, including news feeds and social media platforms. The data is cleaned, analyzed, and weighted to compute the Satoshi Index. A concise summary, reflecting key market events and sentiment, is generated alongside the score. Historical data, including past indices and Bitcoin prices, is available on our dedicated history page.</p>
-    
-    <h2>Transparency and Reliability</h2>
-    <p>Our methodology prioritizes accuracy and transparency. The index is computed using automated, data-driven algorithms to minimize bias. Scores are logged daily in a secure database, accessible via our historical data page, allowing users to track Bitcoin’s sentiment over time. In case of data source failures, weights are redistributed to maintain index stability.</p>
-    
-    <footer>
+    <h1>Historical Satoshi Index & Bitcoin Price</h1>
+    <table id="historyTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Satoshi Index</th>
+          <th>Bitcoin Price (USD)</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td colspan="3" class="loading">Loading...</td></tr>
+      </tbody>
+    </table>
+    <footer class="mt-8 text-center">
       <a href="https://nakamotosatoshi.ai" class="neon-link">Home</a>
-      <a href="https://nakamotosatoshi.ai/history.html" class="neon-link">Historical Data</a>
-      <a href="https://nakamotosatoshi.ai/privacy-policy.html" class="neon-link">Privacy</a>
+      <a href="how-it-works.html" class="neon-link">How It Works</a>
+      <a href="privacy-policy.html" class="neon-link">Privacy</a>
     </footer>
   </div>
+  <script>
+    async function fetchHistoricalData() {
+      try {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbxjW6Y11H156cgv8t4F6G3X6ZivQYlQLZ_c2FOXXwEXBZ3g1xgYJgyAumseoYl1bRCp/exec?action=getHistoricalDataWithPrice');
+        const data = await response.json();
+        const tbody = document.querySelector('#historyTable tbody');
+        tbody.innerHTML = '';
+        if (data.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="3">No data available</td></tr>';
+          return;
+        }
+        data.forEach(item => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${item.date}</td>
+            <td>${item.satoshiIndex}</td>
+            <td>${item.bitcoinPrice ? '$' + item.bitcoinPrice.toFixed(2) : 'N/A'}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      } catch (error) {
+        console.error('Error fetching historical data:', error);
+        const tbody = document.querySelector('#historyTable tbody');
+        tbody.innerHTML = '<tr><td colspan="3">Error loading data</td></tr>';
+      }
+    }
+    window.onload = fetchHistoricalData;
+  </script>
 </body>
 </html>
