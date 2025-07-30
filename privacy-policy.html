@@ -3,84 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nakamoto Privacy Veil - NakamotoSatoshi.ai</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+  <title>Privacy Policy - NakamotoSatoshi.ai</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <script src="https://cdn.tailwindcss.com" defer></script>
   <style>
-    body {
-      font-family: 'Orbitron', monospace;
-      background: #0d0d0d;
-      color: #ffcc00;
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-    canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 0;
-      opacity: 0.15;
-    }
-    .container {
-      position: relative;
-      z-index: 1;
-      max-width: 90%;
-      text-align: center;
-      padding: 20px;
-      border: 2px solid #ffcc00;
-      border-radius: 5px;
-      box-shadow: 0 0 10px #ffcc00;
-      animation: neon-flicker 0.5s ease-in-out infinite alternate;
-    }
-    h1 {
-      font-size: 3em;
-      font-weight: 700;
-      text-shadow: 0 0 5px #ffcc00, 0 0 10px #ffcc00;
-      margin-bottom: 20px;
-      animation: pulse 1.5s ease-in-out infinite;
-    }
-    p {
-      font-size: 1.2em;
-      margin: 20px 0;
-      text-shadow: 0 0 5px #ffcc00;
-    }
-    footer {
-      margin-top: 30px;
-      font-size: 0.9em;
-    }
-    .neon-link {
-      color: #ffcc00;
-      text-decoration: none;
-      margin: 0 10px;
-      transition: all 0.3s ease;
-    }
-    .neon-link:hover {
-      text-shadow: 0 0 10px #ffcc00;
-    }
-    @keyframes pulse {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
-      100% { transform: scale(1); }
-    }
-    @keyframes neon-flicker {
-      0% { text-shadow: 0 0 5px #ffcc00, 0 0 10px #ffcc00; box-shadow: 0 0 10px #ffcc00; }
-      100% { text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00; box-shadow: 0 0 20px #ffcc00; }
-    }
+    body { font-family: 'Orbitron', monospace; background: #0d0d0d; color: #ffcc00; padding: 20px; }
+    .container { max-width: 800px; margin: auto; }
+    h1 { font-size: 2.5rem; text-shadow: 0 0 10px #ffcc00; text-align: center; margin-bottom: 20px; }
+    h2 { font-size: 1.5rem; color: #cc9900; margin-top: 20px; }
+    p { font-size: 1rem; line-height: 1.6; margin-bottom: 15px; }
+    .neon-link { color: #ffcc00; text-decoration: none; margin: 0 10px; }
+    .neon-link:hover { text-shadow: 0 0 10px #ffcc00; }
+    footer { text-align: center; margin-top: 40px; }
   </style>
 </head>
 <body>
-  <canvas id="backgroundCanvas"></canvas>
   <div class="container">
-    <h1>The Nakamoto Privacy Veil</h1>
-    <p>In the shadow of Satoshi, your secrets remain encrypted. We, the Guardians of the Cipher, collect only the offerings necessary to unlock the Vault—your user name and sanctuary email address. These are sealed with the Oracle's hash and shared solely with the divine s@nakamotosatoshi.ai to deliver your Relic. No mortal eyes shall breach this veil.</p>
+    <h1>Privacy Policy</h1>
+    <p>At NakamotoSatoshi.ai, we are committed to protecting your privacy. This Privacy Policy outlines how we collect, use, and safeguard your information when you interact with our website and services. Your trust is paramount, and we adhere to strict standards to ensure your data remains secure.</p>
+    
+    <h2>Information We Collect</h2>
+    <p>We collect minimal personal information to deliver our services, specifically your username and email address. These details are necessary to provide personalized updates, such as the daily Satoshi Index and related notifications, upon your request.</p>
+    
+    <h2>How We Use Your Information</h2>
+    <p>Your information is used solely to communicate with you, including sending requested updates and responding to inquiries. We do not share, sell, or disclose your personal data to third parties, except as required by law or to protect our legal rights.</p>
+    
+    <h2>Data Security</h2>
+    <p>We implement robust security measures to protect your information from unauthorized access, alteration, or disclosure. Your data is stored securely and encrypted where applicable, ensuring confidentiality and integrity.</p>
+    
+    <h2>Contact Us</h2>
+    <p>If you have questions about this Privacy Policy or our data practices, please contact us at <a href="mailto:s@nakamotosatoshi.ai" class="neon-link">s@nakamotosatoshi.ai</a>. We are dedicated to addressing your concerns promptly.</p>
+    
     <footer>
-      <a href="https://nakamotosatoshi.ai" class="neon-link">Home</a> |
-      <a href="/?action=privacy" class="neon-link">Privacy Policy</a>
+      <a href="https://nakamotosatoshi.ai" class="neon-link">Home</a>
     </footer>
   </div>
 </body>
