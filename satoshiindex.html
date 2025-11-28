@@ -3,20 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daily Bitcoin Update - NakamotoSatoshi.ai</title>
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+  <title>NakamotoSatoshi.ai - The Genesis Terminal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
   <script src="https://cdn.tailwindcss.com" defer></script>
   <style>
+    /* --- Existing Styles --- */
     body {
       font-family: 'Orbitron', monospace;
       background: #0d0d0d;
       color: #ffcc00;
       margin: 0;
-      padding: 0;
+      padding: 20px 0;
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start; /* Changed to accommodate longer content */
     }
     canvas {
       position: fixed;
@@ -26,16 +27,21 @@
       height: 100%;
       z-index: 0;
       opacity: 0.15;
+      pointer-events: none;
     }
     .container {
       position: relative;
       z-index: 1;
-      max-width: 90%;
+      max-width: 800px; /* Slightly wider */
+      width: 95%;
       text-align: center;
       padding: 20px;
+      background: rgba(13, 13, 13, 0.8); /* Semi-transparent bg for readability */
+      border: 1px solid rgba(255, 204, 0, 0.2);
+      box-shadow: 0 0 20px rgba(255, 204, 0, 0.1);
     }
     .satoshi-index {
-      font-size: 10rem;
+      font-size: 8rem; /* Slightly smaller to fit tools */
       font-weight: 700;
       color: #ffcc00;
       text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00;
@@ -65,68 +71,241 @@
       text-decoration: none;
       margin: 0 10px;
       transition: all 0.3s ease;
+      display: inline-block;
+      padding: 5px;
     }
     .neon-link:hover {
       text-shadow: 0 0 10px #ffcc00;
+      color: #fff;
     }
-    #loading {
-      font-size: 3em;
+    #loading, .tool-loading {
+      font-size: 2em;
       font-weight: 700;
       border: 2px solid #ffcc00;
       padding: 20px;
       border-radius: 5px;
       box-shadow: 0 0 10px #ffcc00;
       animation: pulse 1.5s ease-in-out infinite, neon-flicker 0.5s ease-in-out infinite alternate;
-    }
-    #error {
-      font-size: 1rem;
-      color: #ff3333;
-      max-width: 600px;
-      margin: 20px auto;
-      text-shadow: 0 0 5px #ff3333;
+      display: inline-block;
     }
     @keyframes pulse {
       0% { transform: scale(1); }
-      50% { transform: scale(1.1); }
+      50% { transform: scale(1.05); }
       100% { transform: scale(1); }
     }
+    
+    /* --- New Tool Styles --- */
+    .tool-nav {
+        margin: 30px 0;
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 10px;
+        border-bottom: 1px solid rgba(255, 204, 0, 0.3);
+        padding-bottom: 15px;
+    }
+    .tool-btn {
+        background: transparent;
+        border: 1px solid #ffcc00;
+        color: #ffcc00;
+        padding: 10px 15px;
+        cursor: pointer;
+        font-family: 'Orbitron', monospace;
+        transition: all 0.3s;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+    }
+    .tool-btn:hover, .tool-btn.active {
+        background: rgba(255, 204, 0, 0.2);
+        box-shadow: 0 0 15px rgba(255, 204, 0, 0.5);
+    }
+    .tool-section {
+        display: none; /* Hidden by default */
+        text-align: left;
+        max-width: 650px;
+        margin: 0 auto;
+        padding: 20px;
+        border: 1px dashed rgba(255, 204, 0, 0.3);
+    }
+    .tool-section.active {
+        display: block;
+        animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .tool-title {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        text-transform: uppercase;
+        text-shadow: 0 0 5px #ffcc00;
+    }
+    /* Form Elements Style */
+    input[type="date"], input[type="number"], input[type="text"] {
+        background: #000;
+        border: 1px solid #ffcc00;
+        color: #ffcc00;
+        padding: 10px;
+        font-family: 'Orbitron', monospace;
+        width: 100%;
+        margin-bottom: 15px;
+        box-sizing: border-box;
+    }
+    input:focus {
+        outline: none;
+        box-shadow: 0 0 10px rgba(255, 204, 0, 0.5);
+    }
+    .action-btn {
+        width: 100%;
+        padding: 12px;
+        background: #ffcc00;
+        color: #000;
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+        font-family: 'Orbitron', monospace;
+        text-transform: uppercase;
+        transition: all 0.3s;
+    }
+    .action-btn:hover {
+        background: #ffe066;
+        box-shadow: 0 0 20px #ffcc00;
+    }
+    .result-box {
+        margin-top: 20px;
+        background: rgba(0, 0, 0, 0.5);
+        padding: 15px;
+        border-left: 3px solid #ffcc00;
+        word-break: break-all;
+    }
+    .result-label {
+        font-size: 0.8rem;
+        opacity: 0.7;
+        display: block;
+        margin-bottom: 5px;
+    }
+    .result-value {
+        font-size: 1.2rem;
+        text-shadow: 0 0 5px #ffcc00;
+    }
+    .terminal-log {
+        font-family: 'Courier New', Courier, monospace; /* More terminal like for logs */
+        font-size: 0.9rem;
+        height: 150px;
+        overflow-y: auto;
+        background: #000;
+        border: 1px solid #ffcc00;
+        padding: 10px;
+        margin-top: 10px;
+        color: #0f0; /* Classic terminal green for logs */
+    }
+
     @media (max-width: 600px) {
       .satoshi-index { font-size: 5rem; }
       .summary { font-size: 0.9rem; }
+      .tool-btn { font-size: 0.7rem; padding: 8px 10px; }
     }
   </style>
 </head>
 <body>
   <canvas id="glitchCanvas"></canvas>
   <div class="container">
-    <div id="loading" class="flex justify-center items-center">LOADING</div>
-    <div id="content" style="display: none;">
-      <div class="satoshi-index" id="satoshiIndex"></div>
-      <p class="summary" id="summary"></p>
-      <p class="date" id="date"></p>
-      <p id="error" style="display: none;"></p>
-      <footer class="mt-8">
-        <a href="https://nakamotosatoshi.ai" class="neon-link">Home</a>
-        <a href="https://nakamotosatoshi.ai/how-it-works.html" class="neon-link">How it works</a>
-        <a href="https://nakamotosatoshi.ai/history.html" class="neon-link">Historical Data</a>
-        <a href="https://nakamotosatoshi.ai/decode.html" class="neon-link">Decode</a>
-        <a href="https://nakamotosatoshi.ai/privacy-policy.html" class="neon-link">Privacy</a>
-        <a href="https://nowpayments.io/donation/nakamotosatoshi" class="neon-link">Support Me</a>
-      </footer>
-    </div>
+    
+    <section id="dashboard-section" class="tool-section active">
+        <div id="loading">INITIALIZING NODE...</div>
+        <div id="content" style="display: none;">
+          <div class="satoshi-index" id="satoshiIndex"></div>
+          <p class="summary" id="summary"></p>
+          <p class="date" id="date"></p>
+        </div>
+    </section>
+
+    <nav class="tool-nav" id="toolNav">
+        <button class="tool-btn active" data-target="dashboard-section">Dashboard</button>
+        <button class="tool-btn" data-target="satoshi-schedule">Satoshi's Schedule</button>
+        <button class="tool-btn" data-target="genesis-hasher">Genesis Hasher</button>
+        <button class="tool-btn" data-target="fiat-time-machine">Fiat Time-Machine</button>
+    </nav>
+
+    <section id="satoshi-schedule" class="tool-section">
+        <h2 class="tool-title">[ Absolute Supply Calculator ]</h2>
+        <p style="font-size: 0.9rem; margin-bottom: 20px;">Calculate the mathematical truth of Bitcoin's supply for any future date based on the source code.</p>
+        <div>
+            <label for="schedule-date" class="result-label">Select Target Date:</label>
+            <input type="date" id="schedule-date">
+            <button class="action-btn" onclick="calculateSupply()">Execute Calculation</button>
+        </div>
+        <div id="schedule-result" class="result-box" style="display:none;">
+            </div>
+    </section>
+
+    <section id="genesis-hasher" class="tool-section">
+        <h2 class="tool-title">[ SHA-256 Simulator ]</h2>
+        
+        <div style="margin-bottom: 30px;">
+            <h3 style="border-bottom: 1px solid #ffcc00; display:inline-block;">Mode A: Text Hashing</h3>
+            <p style="font-size: 0.9rem;">Enter text to see its SHA-256 hash instantly.</p>
+            <input type="text" id="hash-input" placeholder="Enter text here (e.g., 'Hello Satoshi')">
+            <div class="result-box">
+                <span class="result-label">SHA-256 Output:</span>
+                <span id="hash-output" class="result-value" style="font-size: 1rem;"></span>
+            </div>
+        </div>
+
+        <div>
+            <h3 style="border-bottom: 1px solid #ffcc00; display:inline-block;">Mode B: Mining Simulation (PoW)</h3>
+            <p style="font-size: 0.9rem;">Find a Nonce that produces a hash starting with "0000".</p>
+            <input type="text" id="mine-input" value="Block #840000 header data..." placeholder="Block Data">
+            <button class="action-btn" id="mine-btn" onclick="startMining()">Start Mining Sequence</button>
+            <div class="terminal-log" id="mining-log">
+                [Waiting for input...]_
+            </div>
+        </div>
+    </section>
+
+    <section id="fiat-time-machine" class="tool-section">
+        <h2 class="tool-title">[ Fiat Devaluation Tracker ]</h2>
+        <p style="font-size: 0.9rem; margin-bottom: 20px;">See how much Bitcoin you could have bought in the past and its value today.</p>
+        <div>
+            <label class="result-label">Past Date:</label>
+            <input type="date" id="tm-date" min="2010-07-17">
+            <label class="result-label">USD Amount Invested:</label>
+            <input type="number" id="tm-amount" placeholder="e.g., 1000">
+            <button class="action-btn" onclick="calculateTimeMachine()">Actuate Time Machine</button>
+        </div>
+        
+        <div id="tm-loading" class="tool-loading" style="display:none; margin-top: 20px; font-size: 1.2rem;">
+            FETCHING HISTORICAL DATA...
+        </div>
+
+        <div id="tm-result" class="result-box" style="display:none;">
+            </div>
+    </section>
+
+
+    <p id="error" style="display: none; color: #ff3333; margin-top: 20px;"></p>
+    
+    <footer class="mt-8" style="border-top: 1px solid rgba(255,204,0,0.3); padding-top: 20px;">
+      <a href="https://nakamotosatoshi.ai" class="neon-link">Home</a>
+      <span style="opacity: 0.5; font-size: 0.8rem;">| Vires in Numeris</span>
+    </footer>
   </div>
+
+
   <script>
+    // ==========================================
+    // 1. CORE / EXISTING FUNCTIONALITY
+    // ==========================================
+    const GAS_URL = 'https://script.google.com/macros/s/AKfycbxjW6Y11H156cgv8t4F6G3X6ZivQYlQLZ_c2FOXXwEXBZ3g1xgYJgyAumseoYl1bRCp/exec';
+
     function initCanvas() {
+      // ... (Your existing canvas code - kept same for brevity) ...
       const canvas = document.getElementById('glitchCanvas');
       const ctx = canvas.getContext('2d');
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       let lastDraw = 0;
       function drawGlitch(timestamp) {
-        if (timestamp - lastDraw < 100) {
-          requestAnimationFrame(drawGlitch);
-          return;
-        }
+        if (timestamp - lastDraw < 100) { requestAnimationFrame(drawGlitch); return; }
         lastDraw = timestamp;
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         ctx.strokeStyle = 'rgba(255, 204, 0, 0.1)';
@@ -149,30 +328,252 @@
     }
 
     function fetchContent() {
+      // Keep existing fetch logic for the main dashboard
       document.getElementById('loading').style.display = 'block';
       document.getElementById('content').style.display = 'none';
-      document.getElementById('error').style.display = 'none';
-      fetch('https://script.google.com/macros/s/AKfycbxjW6Y11H156cgv8t4F6G3X6ZivQYlQLZ_c2FOXXwEXBZ3g1xgYJgyAumseoYl1bRCp/exec?action=getDailyUpdate')
+      fetch(`${GAS_URL}?action=getDailyUpdate`)
         .then(response => response.json())
         .then(data => {
           document.getElementById('satoshiIndex').textContent = data.satoshiIndex || 'N/A';
           document.getElementById('summary').textContent = data.summary || 'No summary available.';
-          document.getElementById('date').textContent = `Updated: ${data.date || 'Unknown'}`;
+          document.getElementById('date').textContent = `Last Sync: ${data.date || 'Unknown'}`;
           document.getElementById('loading').style.display = 'none';
           document.getElementById('content').style.display = 'block';
         })
-        .catch(error => {
-          document.getElementById('error').textContent = `Failed to load update: ${error.message}. Please try again later.`;
-          document.getElementById('error').style.display = 'block';
-          document.getElementById('loading').style.display = 'none';
-          document.getElementById('content').style.display = 'block';
-        });
+        .catch(error => handleMainError(error));
     }
 
+    function handleMainError(error) {
+        document.getElementById('loading').style.display = 'none';
+        const errorEl = document.getElementById('error');
+        errorEl.textContent = `SYSTEM FAILURE: ${error.message}. Retrying connection...`;
+        errorEl.style.display = 'block';
+    }
+
+    // Navigation Logic
+    document.getElementById('toolNav').addEventListener('click', (e) => {
+        if (e.target.classList.contains('tool-btn')) {
+            // Update buttons
+            document.querySelectorAll('.tool-btn').forEach(btn => btn.classList.remove('active'));
+            e.target.classList.add('active');
+            
+            // Update sections
+            const targetId = e.target.getAttribute('data-target');
+            document.querySelectorAll('.tool-section').forEach(sec => sec.classList.remove('active'));
+            document.getElementById(targetId).classList.add('active');
+        }
+    });
+
+    // ==========================================
+    // TOOL 1: SATOSHI'S SCHEDULE (JS Only)
+    // ==========================================
+    function calculateSupply() {
+        const dateInput = document.getElementById('schedule-date').value;
+        if (!dateInput) return alert("Please select a date.");
+
+        const targetDate = new Date(dateInput);
+        const genesisDate = new Date('2009-01-03T18:15:05Z'); // Genesis Block timestamp
+        
+        // Estimate block height based on 10-minute average
+        const msDiff = targetDate - genesisDate;
+        if (msDiff < 0) return alert("Date must be after Genesis Block (2009-01-03).");
+        
+        const minutesDiff = msDiff / (1000 * 60);
+        const estimatedHeight = Math.floor(minutesDiff / 10);
+
+        let supply = 0;
+        let reward = 50.0;
+        let currentBlock = 0;
+        const halvingInterval = 210000;
+
+        while (currentBlock < estimatedHeight) {
+            let nextHalving = Math.floor(currentBlock / halvingInterval + 1) * halvingInterval;
+            let blocksInThisEra = Math.min(nextHalving, estimatedHeight) - currentBlock;
+            
+            supply += blocksInThisEra * reward;
+            
+            reward = reward / 2;
+            currentBlock = nextHalving;
+            
+            if (reward < 0.00000001) break; // Satoshi unit limit
+        }
+        
+        // Cap supply at 21M (accounting for rounding errors in simple floats)
+        supply = Math.min(supply, 20999999.9769);
+
+        const halvingsPassed = Math.floor(estimatedHeight / halvingInterval);
+        const currentReward = 50 / Math.pow(2, halvingsPassed);
+        const percentMined = (supply / 21000000 * 100).toFixed(4);
+
+        const resultHTML = `
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: left;">
+                <div>
+                    <span class="result-label">Est. Block Height:</span>
+                    <span class="result-value">${estimatedHeight.toLocaleString()}</span>
+                </div>
+                <div>
+                    <span class="result-label">Block Reward Then:</span>
+                    <span class="result-value">${currentReward.toFixed(8)} BTC</span>
+                </div>
+            </div>
+            <div style="margin-top: 15px; border-top: 1px solid #ffcc00; padding-top: 15px;">
+                <span class="result-label">Total Theoretical Supply on Date:</span>
+                <span class="result-value" style="font-size: 1.8rem">${supply.toLocaleString(undefined, {minimumFractionDigits: 8, maximumFractionDigits: 8})} BTC</span>
+            </div>
+            <div style="margin-top: 10px;">
+                <span class="result-label">Supply Progress:</span>
+                <progress value="${percentMined}" max="100" style="width:100%; height: 20px; accent-color: #ffcc00;"></progress>
+                <span style="float:right">${percentMined}% Mined</span>
+            </div>
+        `;
+        const resultBox = document.getElementById('schedule-result');
+        resultBox.innerHTML = resultHTML;
+        resultBox.style.display = 'block';
+    }
+
+
+    // ==========================================
+    // TOOL 2: GENESIS HASHER (JS Only - Crypto API)
+    // ==========================================
+    // Mode A: Simple Hash
+    document.getElementById('hash-input').addEventListener('input', async (e) => {
+        const text = e.target.value;
+        if (!text) {
+            document.getElementById('hash-output').textContent = '';
+            return;
+        }
+        const msgBuffer = new TextEncoder().encode(text);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        document.getElementById('hash-output').textContent = hashHex;
+    });
+
+    // Mode B: Mining Sim
+    let isMining = false;
+    async function startMining() {
+        if (isMining) return; // Prevent double clicking
+        isMining = true;
+        const btn = document.getElementById('mine-btn');
+        const log = document.getElementById('mining-log');
+        const blockData = document.getElementById('mine-input').value || "Block Data";
+        
+        btn.textContent = "MINING IN PROGRESS...";
+        btn.style.opacity = 0.5;
+        log.innerHTML = `[STARTING PoW SEQUENCE for data: "${blockData.substring(0,20)}..."]\nTarget: Hash starting with "0000"\n------------------------------------------\n`;
+
+        let nonce = 0;
+        let found = false;
+        const startTime = performance.now();
+
+        // Use a loop with breaks to keep UI responsive
+        const mineLoop = async () => {
+            for (let i = 0; i < 1000; i++) { // Run a batch of hashes
+                const input = blockData + nonce;
+                const msgBuffer = new TextEncoder().encode(input);
+                const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+                const hashArray = Array.from(new Uint8Array(hashBuffer));
+                // Only convert first few bytes to hex for speed checking
+                const hashPrefix = hashArray.slice(0, 2).map(b => b.toString(16).padStart(2, '0')).join('');
+                
+                if (hashPrefix.startsWith('0000')) {
+                    // Full hash for display
+                    const fullHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+                    const timeTaken = ((performance.now() - startTime) / 1000).toFixed(2);
+                    log.innerHTML += `\n>>> SUCCESS! Valid Block Found <<< \nNonce: ${nonce}\nHash: ${fullHash}\nTime: ${timeTaken}s\n`;
+                    log.scrollTop = log.scrollHeight;
+                    found = true;
+                    break;
+                }
+                nonce++;
+            }
+
+            if (found) {
+                isMining = false;
+                btn.textContent = "Start Mining Sequence";
+                btn.style.opacity = 1;
+            } else {
+                if (nonce % 10000 === 0) {
+                    log.innerHTML += `Scanning... Nonce > ${nonce}\n`;
+                    log.scrollTop = log.scrollHeight;
+                }
+                // Yield to main thread to allow UI updates, then continue
+                setTimeout(mineLoop, 0); 
+            }
+        };
+
+        mineLoop();
+    }
+
+
+    // ==========================================
+    // TOOL 3: FIAT TIME-MACHINE (JS + Backend API)
+    // ==========================================
+    function calculateTimeMachine() {
+        const dateStr = document.getElementById('tm-date').value;
+        const amount = document.getElementById('tm-amount').value;
+        const resultBox = document.getElementById('tm-result');
+        const loading = document.getElementById('tm-loading');
+
+        if (!dateStr || !amount || amount <= 0) return alert("Please enter a valid date and amount.");
+
+        loading.style.display = 'block';
+        resultBox.style.display = 'none';
+
+        // Call Google Apps Script with new action
+        fetch(`${GAS_URL}?action=calculateFiatLost&date=${dateStr}&amount=${amount}`)
+            .then(response => response.json())
+            .then(data => {
+                loading.style.display = 'none';
+                if (data.error) {
+                    resultBox.innerHTML = `<span style="color:red">Error: ${data.error}</span>`;
+                    resultBox.style.display = 'block';
+                    return;
+                }
+
+                const btcBought = parseFloat(data.btcBought);
+                const currentValue = parseFloat(data.currentValueUsd);
+                const gainPercent = parseFloat(data.gainPercent);
+
+                const resultHTML = `
+                    <div style="text-align: left;">
+                        <p><span class="result-label">On ${data.queryDate}, $${amount} USD could buy:</span>
+                        <span class="result-value" style="color:#fff">${btcBought.toFixed(8)} BTC</span> (at ~$${data.historicalPrice} / BTC)</p>
+                        
+                        <div style="margin: 20px 0; border-top: 1px dashed #ffcc00; border-bottom: 1px dashed #ffcc00; padding: 15px 0;">
+                            <span class="result-label" style="font-size: 1rem;">TODAY'S VALUE (at ~$${data.currentPrice} / BTC):</span>
+                            <span class="result-value" style="font-size: 2.5rem; display:block; margin-top:10px;">$${currentValue.toLocaleString(undefined, {maximumFractionDigits: 2})}</span>
+                        </div>
+
+                        <p><span class="result-label">Fiat Value Change:</span>
+                        <span class="result-value" style="color: ${gainPercent > 0 ? '#0f0' : '#f00'}">+${gainPercent.toLocaleString()}%</span></p>
+                    </div>
+                `;
+                resultBox.innerHTML = resultHTML;
+                resultBox.style.display = 'block';
+            })
+            .catch(error => {
+                loading.style.display = 'none';
+                alert("Failed to connect to historical records server.");
+            });
+    }
+
+
+    // ==========================================
+    // INITIALIZATION
+    // ==========================================
     document.addEventListener('DOMContentLoaded', () => {
       initCanvas();
-      fetchContent();
-      setInterval(fetchContent, 6 * 60 * 60 * 1000); // Refresh every 6 hours
+      fetchContent(); // Load main dashboard data
+      
+      // Set default date for Time Machine to something interesting (e.g., 10 years ago)
+      const tenYearsAgo = new Date();
+      tenYearsAgo.setFullYear(tenYearsAgo.getFullYear() - 10);
+      try {
+        document.getElementById('tm-date').value = tenYearsAgo.toISOString().split('T')[0];
+      } catch(e) { /* ignore if date input isn't supported well */ }
+      
+      setInterval(fetchContent, 6 * 60 * 60 * 1000); // Keep dashboard sync
     });
   </script>
 </body>
