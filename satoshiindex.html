@@ -568,7 +568,23 @@
     document.addEventListener('DOMContentLoaded', () => {
       initCanvas();
       fetchContent(); // Load main dashboard data
-      
+      recordVisitorSilently(); 
+      setInterval(fetchContent, 6 * 60 * 60 * 1000); 
+});
+
+// --- 新增：靜默記錄函數 ---
+function recordVisitorSilently() {
+    // 發送請求，然後乜都唔洗理 (Fire and forget)
+    fetch(`${GAS_URL}?action=recordHit`)
+        .then(() => {
+            // 可以在 console 留個底方便自己 debug，但網頁上唔會有任何反應
+            console.log("Visitor ping sent.");
+        })
+        .catch(e => {
+            // 靜默失敗，唔好驚動用戶
+            console.warn("Analytics ping failed silently.");
+        });
+}
       // Set default date for Time Machine to something interesting (e.g., 10 years ago)
       const tenYearsAgo = new Date();
       tenYearsAgo.setFullYear(tenYearsAgo.getFullYear() - 10);
